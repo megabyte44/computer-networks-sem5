@@ -1,0 +1,1561 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>CN Lab Exam Pack</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: desktop = fixed program rail + reading column; mobile = top progress bar, chip nav and a prev/next dock.
+   Each program sheet leads with a run/output panel, then collapsible study groups. Committed dark world, red signal accent. */
+:root{
+ --bg:#09090c; --panel:#121217; --raised:#1a1a21; --line:#2a2a33; --line2:#1f1f27;
+ --ink:#f3f3f6; --body:#d3d3dc; --mute:#9494a3;
+ --red:#ff3d52; --red-d:#d92338; --red-soft:rgba(255,61,82,.12); --red-line:rgba(255,61,82,.38);
+ --amber:#ffb454; --amber-soft:rgba(255,180,84,.11); --amber-line:rgba(255,180,84,.34);
+ --ok:#4ade9a; --ok-soft:rgba(74,222,154,.09); --ok-line:rgba(74,222,154,.3);
+ --term:#050507; --term-ink:#e6e6ee; --term-mute:#7b7b8c;
+ --font-d:'Bricolage Grotesque','Segoe UI',system-ui,sans-serif;
+ --font-b:'Source Sans 3','Segoe UI',system-ui,sans-serif;
+ --font-m:'JetBrains Mono',ui-monospace,Consolas,monospace;
+ --side:272px; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:calc(116px + env(safe-area-inset-top,0px))}
+@media(min-width:1000px){html{scroll-padding-top:24px}}
+body{background:var(--bg);color:var(--body);font-family:var(--font-b);font-size:17px;line-height:1.65;margin:0;padding-block:0 calc(88px + env(safe-area-inset-bottom,0px));-webkit-text-size-adjust:100%}
+a{color:var(--red)}
+/* ---------- desktop rail ---------- */
+.side{display:none}
+.main{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));min-width:0}
+.col{max-width:860px;margin:0 auto}
+@media(min-width:1000px){
+ body{padding-left:var(--side);padding-block:0 60px}
+ .side{display:flex;flex-direction:column;position:fixed;inset:0 auto 0 0;width:var(--side);background:var(--panel);border-right:1px solid var(--line2);padding:22px 14px 18px;overflow-y:auto;z-index:20}
+ .main{padding-left:40px;padding-right:40px}
+ .top,.dock{display:none!important}
+}
+.brand{padding:0 8px 16px;border-bottom:1px solid var(--line2);margin-bottom:14px}
+.brand b{display:block;font:800 22px/1.1 var(--font-d);color:var(--ink);letter-spacing:-.01em}
+.brand b em{font-style:normal;color:var(--red)}
+.brand span{font:600 11.5px var(--font-m);color:var(--mute);letter-spacing:.08em;text-transform:uppercase}
+.prog{margin:0 8px 16px}.prog .pl{display:flex;justify-content:space-between;font:600 12px var(--font-m);color:var(--mute);margin-bottom:6px}
+.bar{height:5px;background:var(--raised);border-radius:3px;overflow:hidden}.bar i{display:block;height:100%;width:0;background:var(--red);border-radius:3px;transition:width .3s}
+.side nav{display:flex;flex-direction:column;gap:2px}
+.side nav a{display:flex;align-items:center;gap:10px;min-height:40px;padding:6px 10px;border-radius:8px;color:var(--body);text-decoration:none;font-size:15.5px;border:1px solid transparent}
+.side nav a i{font:600 12px var(--font-m);font-style:normal;min-width:30px;text-align:center;padding:2px 0;border-radius:5px;background:var(--raised);color:var(--mute)}
+.side nav a[data-lang="java"] i{color:var(--amber)}
+.side nav a[data-lang="ns2"] i{color:var(--red)}
+.side nav a:hover{background:var(--raised)}
+.side nav a.on{background:var(--red-soft);border-color:var(--red-line);color:var(--ink)}
+.side nav a.on i{background:var(--red);color:#fff}
+.ck{margin-left:auto;width:16px;height:16px;border-radius:50%;border:1.5px solid var(--line)}
+.dn .ck{background:var(--ok);border-color:var(--ok);box-shadow:inset 0 0 0 3px var(--panel)}
+/* ---------- mobile top + dock ---------- */
+.top{position:sticky;top:0;z-index:20;margin:0 calc(-1*max(16px,env(safe-area-inset-left,0px))) 0 calc(-1*max(16px,env(safe-area-inset-left,0px)));padding:calc(8px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) 0 max(16px,env(safe-area-inset-left,0px));background:rgba(9,9,12,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line2)}
+.top .row{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+.top .row b{font:800 17px var(--font-d);color:var(--ink)}.top .row b em{font-style:normal;color:var(--red)}
+.top .row .bar{flex:1}.top .row span{font:600 12px var(--font-m);color:var(--mute)}
+.top nav{display:flex;gap:6px;overflow-x:auto;padding:2px 0 10px;scrollbar-width:none}
+.top nav::-webkit-scrollbar{display:none}
+.top nav a{flex:none;min-height:36px;display:flex;align-items:center;padding:0 12px;border-radius:18px;font:600 13.5px var(--font-m);color:var(--mute);text-decoration:none;background:var(--panel);border:1px solid var(--line2)}
+.top nav a.on{background:var(--red);border-color:var(--red);color:#fff}
+.top nav a.dn:not(.on){color:var(--ok);border-color:var(--ok-line)}
+.dock{position:fixed;left:0;right:0;bottom:0;z-index:25;display:flex;gap:8px;align-items:center;padding:8px max(16px,env(safe-area-inset-right,0px)) calc(8px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));background:rgba(18,18,23,.94);backdrop-filter:blur(12px);border-top:1px solid var(--line)}
+.dock button{min-height:46px;border-radius:10px;border:1px solid var(--line);background:var(--raised);color:var(--ink);font:600 14px var(--font-m);padding:0 14px;cursor:pointer}
+.dock button.nx{background:var(--red);border-color:var(--red);color:#fff}
+.dock button:disabled{opacity:.35}
+.dock .cur{flex:1;text-align:center;font:600 13px var(--font-m);color:var(--mute);min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* ---------- hero ---------- */
+.hero{padding:34px 0 18px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font:600 12.5px var(--font-m);letter-spacing:.1em;text-transform:uppercase;color:var(--red)}
+.eyebrow::before{content:"";width:22px;height:2px;background:var(--red)}
+h1{font:800 clamp(38px,7vw,68px)/.98 var(--font-d);letter-spacing:-.025em;color:var(--ink);margin:14px 0 16px;text-wrap:balance}
+h1 em{font-style:normal;color:var(--red)}
+.lede{font-size:19px;color:var(--mute);max-width:60ch;margin:0 0 22px}
+.plan{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin:0 0 18px}
+.plan div{background:var(--panel);border:1px solid var(--line2);border-radius:12px;padding:14px 16px}
+.plan b{display:block;font:700 12px var(--font-m);color:var(--red);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
+.plan span{font-size:16px;color:var(--body)}
+.how{background:var(--panel);border:1px solid var(--line2);border-radius:12px;padding:16px 18px;margin:0 0 20px}
+.how h3{margin:0 0 6px;font:700 19px var(--font-d);color:var(--ink)}
+.how ul{margin:6px 0 0;padding-left:20px}.how li{margin:5px 0}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 22px}
+.btn{min-height:44px;padding:0 16px;border-radius:10px;border:1px solid var(--line);background:var(--raised);color:var(--ink);font:600 13.5px var(--font-m);cursor:pointer}
+.btn:hover{border-color:var(--red-line)}
+/* ---------- sheets ---------- */
+.sec{background:var(--panel);border:1px solid var(--line2);border-radius:16px;padding:22px clamp(14px,3vw,30px) 14px;margin:0 0 20px;min-width:0}
+.sh{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
+.sh h2{font:800 clamp(22px,3.6vw,31px)/1.1 var(--font-d);color:var(--ink);margin:0;flex:1;min-width:220px;text-wrap:balance;letter-spacing:-.012em}
+.badge{font:700 13px var(--font-m);padding:5px 10px;border-radius:7px;background:var(--raised);color:var(--mute);border:1px solid var(--line)}
+.badge.java{color:var(--amber);border-color:var(--amber-line);background:var(--amber-soft)}
+.badge.ns2{color:var(--red);border-color:var(--red-line);background:var(--red-soft)}
+.done{min-height:40px;font:600 13px var(--font-m);background:transparent;border:1px solid var(--line);color:var(--mute);border-radius:8px;padding:0 12px;cursor:pointer}
+.done.on{background:var(--ok-soft);color:var(--ok);border-color:var(--ok-line)}
+h3{font:700 21px var(--font-d);color:var(--ink);margin:22px 0 8px}
+p{margin:0 0 12px;max-width:70ch}
+ul,ol{margin:0 0 14px;padding-left:22px;max-width:70ch}li{margin:5px 0}
+strong{color:var(--ink)}
+code{font:.87em var(--font-m);background:var(--raised);color:#ffd1d6;padding:2px 6px;border-radius:5px;overflow-wrap:anywhere}
+.tw{overflow-x:auto;margin:10px 0 16px;border:1px solid var(--line2);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:15.5px}
+th{text-align:left;font:700 12px var(--font-m);letter-spacing:.07em;text-transform:uppercase;color:var(--mute);background:var(--raised);padding:10px 12px;white-space:nowrap}
+td{padding:10px 12px;border-top:1px solid var(--line2);vertical-align:top}
+td b{color:var(--ink)}
+table.map td code{background:none;color:var(--body);padding:0;white-space:nowrap}
+.tag{font:700 11.5px var(--font-m);padding:3px 8px;border-radius:5px;background:var(--red-soft);color:var(--red)}
+.tag.java{background:var(--amber-soft);color:var(--amber)}
+/* quick panels */
+.quick{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;margin:0 0 12px}
+@media(max-width:820px){.quick{grid-template-columns:minmax(0,1fr)}}
+.qa,.qb{border-radius:12px;padding:14px 16px;min-width:0}
+.qa{background:var(--red-soft);border:1px solid var(--red-line)}
+.qb{background:var(--ok-soft);border:1px solid var(--ok-line)}
+.qa h3,.qb h3{margin:0 0 10px;font:700 12.5px var(--font-m);letter-spacing:.1em;text-transform:uppercase}
+.qa h3{color:var(--red)}.qb h3{color:var(--ok)}
+.fl{font:13px var(--font-m);color:var(--mute);margin:0 0 12px;overflow-wrap:anywhere}
+.step{margin:0 0 9px}.sl{display:block;font:600 12px var(--font-m);color:var(--mute);margin-bottom:4px}
+.cmd{display:flex;gap:8px;align-items:center;background:var(--term);border:1px solid var(--line2);border-radius:9px;padding:6px 6px 6px 12px}
+.cmd code{background:none;color:var(--term-ink);padding:0;flex:1;min-width:0;overflow-x:auto;white-space:pre;font-size:14px}
+.cmd code::before{content:"$ ";color:var(--red)}
+.cp{font:600 12px var(--font-m);background:var(--raised);color:var(--mute);border:1px solid var(--line);border-radius:7px;min-height:34px;padding:0 11px;cursor:pointer;flex:none}
+.cp:hover{color:var(--ink);border-color:var(--red-line)}
+.nt{font-size:15px;color:var(--mute);margin:12px 0 0}
+.ot{margin:0 0 10px}.ot:last-child{margin:0}.ol{font:600 12px var(--font-m);color:var(--mute);margin-bottom:4px}
+.ot pre{margin:0;background:var(--term);border:1px solid var(--line2);color:var(--term-ink);border-radius:9px;padding:11px 13px;font:13.5px/1.55 var(--font-m);overflow-x:auto}
+/* collapsible groups */
+details.grp{border-top:1px solid var(--line2);margin:0}
+details.grp>summary{list-style:none;display:flex;align-items:center;gap:10px;min-height:52px;padding:10px 2px;cursor:pointer;font:700 13px var(--font-m);letter-spacing:.08em;text-transform:uppercase;color:var(--mute);user-select:none}
+details.grp>summary::-webkit-details-marker{display:none}
+details.grp>summary::before{content:"";width:8px;height:8px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(-45deg);transition:transform .15s;flex:none;margin:0 4px 0 2px}
+details.grp[open]>summary::before{transform:rotate(45deg)}
+details.grp.proc>summary{color:var(--red)}details.grp.out>summary{color:var(--ok)}details.grp.viva>summary{color:var(--amber)}details.grp.err>summary{color:#ff8a98}
+details.grp>summary:hover{color:var(--ink)}
+.gb{padding:0 0 12px}
+.code{margin:8px 0 16px;border:1px solid var(--line2);border-radius:11px;overflow:hidden;background:var(--term)}
+.cbar{display:flex;justify-content:space-between;align-items:center;padding:5px 6px 5px 12px;background:var(--raised);color:var(--mute);font:600 11.5px var(--font-m);text-transform:uppercase;letter-spacing:.08em}
+.code pre{margin:0;padding:13px 14px;overflow-x:auto;color:var(--term-ink);font:13.5px/1.6 var(--font-m);tab-size:4}
+.code code{background:none;color:inherit;padding:0;font:inherit}
+.footer{color:var(--mute);font-size:14px;margin:26px 0 0}
+button:focus-visible,a:focus-visible,summary:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+@media(max-width:520px){body{font-size:16.5px}.sh h2{min-width:0;flex-basis:100%}}
+</style>
+<aside class="side"><div class="brand"><b>CN Lab <em>Pack</em></b><span>Programs 1 to 11</span></div>
+<div class="prog"><div class="pl"><span>Revised</span><span class="pc">0 / 12</span></div><div class="bar"><i class="pf"></i></div></div>
+<nav id="snav"><a href="#start"><i>•</i>Overview</a><a href="#ns2"><i>•</i>NS2 basics</a><a href="#trace"><i>•</i>Trace and awk</a><a href="#p1" data-lang="java"><i>1</i>Socket chat<span class="ck"></span></a><a href="#p2" data-lang="java"><i>2</i>Secure file transfer<span class="ck"></span></a><a href="#p3" data-lang="java"><i>3</i>RMI<span class="ck"></span></a><a href="#p4" data-lang="ns2"><i>4</i>Wired simulation<span class="ck"></span></a><a href="#p5" data-lang="ns2"><i>5</i>Wireless simulation<span class="ck"></span></a><a href="#p6a" data-lang="ns2"><i>6A</i>Flow control<span class="ck"></span></a><a href="#p6b" data-lang="ns2"><i>6B</i>Congestion control<span class="ck"></span></a><a href="#p7" data-lang="ns2"><i>7</i>DV and LS routing<span class="ck"></span></a><a href="#p8" data-lang="ns2"><i>8</i>Multicasting<span class="ck"></span></a><a href="#p9" data-lang="java"><i>9</i>DHCP<span class="ck"></span></a><a href="#p10" data-lang="ns2"><i>10</i>Ethernet LAN<span class="ck"></span></a><a href="#p11" data-lang="ns2"><i>11</i>Wireless LAN<span class="ck"></span></a><a href="#ref"><i>•</i>Cheat sheet</a></nav></aside>
+<div class="main"><div class="col">
+<div class="top"><div class="row"><b>CN Lab <em>Pack</em></b><div class="bar"><i class="pf"></i></div><span class="pc">0/12</span></div>
+<nav id="nav"><a href="#start">Start</a><a href="#ns2">NS2</a><a href="#trace">Trace</a><a href="#p1">1</a><a href="#p2">2</a><a href="#p3">3</a><a href="#p4">4</a><a href="#p5">5</a><a href="#p6a">6A</a><a href="#p6b">6B</a><a href="#p7">7</a><a href="#p8">8</a><a href="#p9">9</a><a href="#p10">10</a><a href="#p11">11</a><a href="#ref">Cheat</a></nav></div>
+<header class="hero" id="start">
+<div class="eyebrow">Computer Networks lab exam</div>
+<h1>Programs 1 to 11,<br>from the <em>basics</em>.</h1>
+<p class="lede">Every program opens with how to run it and what the output looks like. Below that: aim, theory, code, explanation, viva answers and common errors.</p>
+<div class="plan">
+<div><b>Tonight</b><span>Basics below, then NS2 Programs 4, 5, 6A, 6B, 7. Sleep by 01:00.</span></div>
+<div><b>Tomorrow morning</b><span>Programs 8, 10, 11, then the Java programs 1, 2, 3, 9.</span></div>
+<div><b>Last 2 hours</b><span>Cover the code, retype each short version from memory, then check it here.</span></div>
+</div>
+<div class="how"><h3>How to study from this page</h3>
+<ul><li><b>Memorise:</b> the NS2 skeleton order, the awk template, the run commands, and the "unique lines" at the top of each program.</li>
+<li><b>Understand:</b> the aim and what the output shows. The viva asks this.</li>
+<li><b>Tested:</b> the Java programs and the NS2 scripts were run, and the outputs shown come from those runs. Your numbers may differ a little.</li>
+<li>Tap a heading to open or close it. Use "Mark revised" to track progress; it is saved in this browser.</li></ul></div>
+<div class="tools"><button class="btn" id="ea" type="button">Expand all</button><button class="btn" id="ca" type="button">Collapse all</button></div>
+<div class="tw"><table class="map"><thead><tr><th>#</th><th>Topic</th><th>Language</th><th>Run</th></tr></thead><tbody><tr><td><b>1</b></td><td>Socket chat</td><td><span class="tag java">Java</span></td><td><code>java Server / java Client</code></td></tr><tr><td><b>2A</b></td><td>Secure file transfer (short)</td><td><span class="tag java">Java</span></td><td><code>java ServerTCP / java ClientTCP</code></td></tr><tr><td><b>2B</b></td><td>Secure file transfer (threads)</td><td><span class="tag java">Java</span></td><td><code>java TCPServer serv_data / java TCPClient cli_data</code></td></tr><tr><td><b>3</b></td><td>RMI</td><td><span class="tag java">Java</span></td><td><code>rmiregistry; java MyServer; java MyClient</code></td></tr><tr><td><b>4</b></td><td>Wired simulation</td><td><span class="tag ns2">NS2</span></td><td><code>ns wired.tcl</code></td></tr><tr><td><b>5</b></td><td>Wireless simulation</td><td><span class="tag ns2">NS2</span></td><td><code>ns wireless.tcl</code></td></tr><tr><td><b>6A</b></td><td>Flow control</td><td><span class="tag ns2">NS2</span></td><td><code>ns flow_control.tcl</code></td></tr><tr><td><b>6B</b></td><td>Congestion control</td><td><span class="tag ns2">NS2</span></td><td><code>ns congestion_control.tcl</code></td></tr><tr><td><b>7</b></td><td>DV and LS routing</td><td><span class="tag ns2">NS2</span></td><td><code>ns DV.tcl; ns LS.tcl</code></td></tr><tr><td><b>8</b></td><td>Multicasting</td><td><span class="tag ns2">NS2</span></td><td><code>ns multicast.tcl</code></td></tr><tr><td><b>9</b></td><td>DHCP</td><td><span class="tag java">Java</span></td><td><code>java DHCPServer / java DHCPClient</code></td></tr><tr><td><b>10</b></td><td>Ethernet LAN</td><td><span class="tag ns2">NS2</span></td><td><code>ns ethernet_lan.tcl</code></td></tr><tr><td><b>11</b></td><td>Wireless LAN</td><td><span class="tag ns2">NS2</span></td><td><code>ns wireless_lan_SHORT.tcl</code></td></tr></tbody></table></div>
+</header>
+<section class="sec" id="ns2"><div class="sh"><span class="badge fnd">Basics</span><h2>NS2 basics: the skeleton every script follows</h2></div><p>Every NS2 script is the same nine steps in the same order; only the topology and the traffic change. NS2 is a discrete-event simulator: you describe a network and a timetable of events in a Tcl script, run <code>ns script.tcl</code>, and it writes a trace file (<code>.tr</code>, one line per packet event) and an animation file (<code>.nam</code>).</p><details class="grp " open><summary>The nine steps</summary><div class="gb"><ol><li>Create the simulator.</li><li>Open the trace file and the nam file.</li><li>Create the nodes.</li><li>Create the links between nodes.</li><li>Create agents (the transport protocol), attach them to nodes and connect sender to receiver.</li><li>Create applications (the traffic source) and attach them to agents.</li><li>Schedule events with <code>$ns at time &quot;command&quot;</code>.</li><li>Write the <code>finish</code> procedure: flush the trace, close the files, start nam, exit.</li><li>Call <code>$ns run</code>.</li></ol><p><strong>The smallest complete example</strong> (a UDP flow from n0 to n2 through n1):</p><div class="code"><div class="cbar"><span>tcl</span><button class="cp" type="button">Copy</button></div><pre><code>set ns [new Simulator]
+
+set tf [open out.tr w]
+$ns trace-all $tf
+set nf [open out.nam w]
+$ns namtrace-all $nf
+
+set n0 [$ns node]
+set n1 [$ns node]
+set n2 [$ns node]
+
+$ns duplex-link $n0 $n1 1Mb 10ms DropTail
+$ns duplex-link $n1 $n2 1Mb 10ms DropTail
+
+set udp [new Agent/UDP]
+set null [new Agent/Null]
+$ns attach-agent $n0 $udp
+$ns attach-agent $n2 $null
+$ns connect $udp $null
+
+set cbr [new Application/Traffic/CBR]
+$cbr attach-agent $udp
+
+$ns at 1.0 &quot;$cbr start&quot;
+$ns at 4.0 &quot;$cbr stop&quot;
+$ns at 5.0 &quot;finish&quot;
+
+proc finish {} {
+    global ns tf nf
+    $ns flush-trace
+    close $tf
+    close $nf
+    exec nam out.nam &amp;
+    exit 0
+}
+
+$ns run</code></pre></div><p>If you can reproduce this from memory, you already have 60 percent of every program. Each later program adds a different protocol, topology or routing command on top of it.</p></div></details><details class="grp " open><summary>Command glossary</summary><div class="gb"><div class="tw"><table><tr><th>Command</th><th>What it does</th></tr><tr><td><code>new Simulator</code></td><td>Creates the simulator object; everything else is created through it</td></tr><tr><td><code>trace-all</code></td><td>Logs every packet event to the trace file</td></tr><tr><td><code>namtrace-all</code></td><td>Logs events for the nam animation</td></tr><tr><td><code>$ns node</code></td><td>Creates a node</td></tr><tr><td><code>duplex-link a b BW delay QUEUE</code></td><td>Two-way link. DropTail is a FIFO queue that drops new arrivals when full; RED drops packets randomly before the queue is full</td></tr><tr><td><code>Agent/TCP</code>, <code>Agent/TCPSink</code></td><td>TCP sender and its receiver, which sends ACKs back</td></tr><tr><td><code>Agent/UDP</code>, <code>Agent/Null</code></td><td>UDP sender and a receiver that just discards packets; no ACKs</td></tr><tr><td><code>attach-agent node agent</code></td><td>Puts an agent on a node</td></tr><tr><td><code>connect sender receiver</code></td><td>Pairs a sender agent with its receiver</td></tr><tr><td><code>Application/FTP</code></td><td>Bulk transfer source, runs on TCP</td></tr><tr><td><code>Application/Traffic/CBR</code></td><td>Constant bit rate source, runs on UDP</td></tr><tr><td><code>Application/Traffic/Exponential</code></td><td>On/off source with exponentially distributed on and off periods</td></tr><tr><td><code>$ns at t &quot;cmd&quot;</code></td><td>Runs <code>cmd</code> at simulation time <code>t</code></td></tr><tr><td><code>flush-trace</code></td><td>Forces buffered events into the trace file; skip it and the trace may be incomplete</td></tr><tr><td><code>$ns run</code></td><td>Starts the event loop</td></tr></table></div></div></details><details class="grp " open><summary>Tcl rules that cause most exam errors</summary><div class="gb"><ul><li><code>set x 5</code> assigns, <code>$x</code> reads, <code>[cmd]</code> runs a command and returns its result, <code>expr</code> does arithmetic.</li><li>Inside a <code>proc</code>, outer variables are invisible. Declare them with <code>global</code>, and get the simulator with <code>set ns [Simulator instance]</code> if it is not declared global.</li><li>The opening brace of a <code>proc</code> must be on the same line as <code>proc</code>. <code>proc finish {}</code> followed by <code>{</code> on the next line is a syntax error.</li><li>Arrays are written <code>n($i)</code>; loops are <code>for {set i 0} {$i &lt; 6} {incr i} { ... }</code>.</li><li>Commands scheduled with <code>$ns at</code> are strings, so they sit inside double quotes.</li></ul></div></details></section><section class="sec" id="trace"><div class="sh"><span class="badge fnd">Basics</span><h2>Trace file and the awk template</h2></div><p>Every analysis script in this pack is the same awk program with one number changed: the node that receives the data. Learn the trace line once and you can read all of them.</p><p><strong>A wired trace line</strong> (one packet event per line):</p><div class="code"><div class="cbar"><span>text</span><button class="cp" type="button">Copy</button></div><pre><code>r 1.025 1 4 cbr 1000 ------- 1 0.0 3.0 5 12</code></pre></div><div class="tw"><table><tr><th>Column</th><th>Field</th><th>Meaning</th></tr><tr><td>$1</td><td>event</td><td><code>+</code> enqueued, <code>-</code> dequeued, <code>r</code> received, <code>d</code> dropped</td></tr><tr><td>$2</td><td>time</td><td>Simulation time in seconds</td></tr><tr><td>$3</td><td>from node</td><td>Node the packet left</td></tr><tr><td>$4</td><td>to node</td><td>Node the packet is arriving at</td></tr><tr><td>$5</td><td>type</td><td><code>tcp</code>, <code>ack</code>, <code>cbr</code>, <code>udp</code> and so on</td></tr><tr><td>$6</td><td>size</td><td>Packet size in bytes</td></tr><tr><td>$8</td><td>flow id</td><td>Which flow the packet belongs to</td></tr><tr><td>$11</td><td>seq</td><td>Sequence number</td></tr><tr><td>$12</td><td>packet id</td><td>Unique id</td></tr></table></div><p>A packet crossing three links produces three <code>r</code> lines, one per hop. Filtering on <code>$4 == SINK_NODE</code> counts it only once, at its last hop. ACKs travel back towards the sender, so they have a different <code>$4</code> and are not counted.</p><details class="grp " open><summary>The awk template</summary><div class="gb"><div class="code"><div class="cbar"><span>awk</span><button class="cp" type="button">Copy</button></div><pre><code>BEGIN { bytes = 0; first = 0; last = 0; flag = 0 }
+{
+    if ($1 == &quot;r&quot; &amp;&amp; $4 == SINK_NODE) {
+        bytes += $6
+        if (flag == 0) { first = $2; flag = 1 }
+        last = $2
+    }
+}
+END {
+    t = last - first
+    print &quot;Bytes received =&quot;, bytes
+    print &quot;Time          =&quot;, t
+    print &quot;Throughput    =&quot;, bytes / t, &quot;bytes/sec&quot;
+}</code></pre></div><p>Throughput = total bytes received divided by the time between the first and last receive. Multiply by 8 for bits per second.</p></div></details><details class="grp " open><summary>What to change per program</summary><div class="gb"><div class="tw"><table><tr><th>Program</th><th>Trace file</th><th>Filter in the repo script</th></tr><tr><td>6A Flow control</td><td><code>trace1.tr</code></td><td><code>$1==&quot;r&quot; &amp;&amp; $4==2</code> (corrected from 7)</td></tr><tr><td>6B Congestion control</td><td><code>TCPcc.tr</code></td><td><code>$1==&quot;r&quot; &amp;&amp; $4==5</code></td></tr><tr><td>7 DV and LS</td><td><code>out_dv.tr</code>, <code>out_ls.tr</code></td><td><code>$1==&quot;r&quot; &amp;&amp; $4==3</code> &amp;&amp; $5==&quot;tcp&quot; (corrected from 7)</td></tr><tr><td>10 Ethernet LAN</td><td><code>LAN.tr</code></td><td><code>$1==&quot;r&quot; &amp;&amp; $3==6</code></td></tr></table></div><p><strong>Wireless traces look different.</strong> A wireless trace line has the event first (<code>s</code> send, <code>r</code> receive, <code>D</code> drop), then time, then the node as <code>_3_</code>, then the layer (<code>AGT</code> application, <code>RTR</code> routing, <code>MAC</code>), and the packet type and size further along. That is why the wireless awk script in Program 5 matches on <code>$4 == &quot;AGT&quot;</code> instead of a node number. Program 11 does not need awk: it records throughput inside the simulation with a LossMonitor and a <code>record</code> procedure.</p><p><strong>The </strong><strong><code>record</code></strong><strong> procedure, used in 6A, 6B, 7 and 11.</strong> It is an alternative to awk: every 0.1 s it reads <code>bytes_</code> from the sink, writes <code>time value</code> to a file, resets <code>bytes_</code> to 0 and schedules itself again. xgraph then plots that file. The line <code>bw/time*8/1000000</code> converts bytes per interval to Mbps.</p></div></details></section>
+<section class="sec" id="p1"><div class="sh"><span class="badge java">P1</span><h2>Program 1: Socket chat between a client and a server (Java, TCP)</h2><button class="done" type="button" data-id="p1">Mark revised</button></div><div class="quick"><div class="qa"><h3>How to run</h3><p class="fl">Files: Server.java, Client.java</p><div class="step"><span class="sl">Compile</span><div class="cmd"><code>javac Server.java Client.java</code><button class="cp" type="button">Copy</button></div></div><div class="step"><span class="sl">Terminal 1 (start first)</span><div class="cmd"><code>java Server</code><button class="cp" type="button">Copy</button></div></div><div class="step"><span class="sl">Terminal 2</span><div class="cmd"><code>java Client</code><button class="cp" type="button">Copy</button></div></div><p class="nt">Type messages in the client and the server alternately. Type &quot;over&quot; to end.</p></div><div class="qb"><h3>What you will see</h3><div class="ot"><div class="ol">Terminal 1 (server)</div><pre>Server Started
+Waiting for Connection.....
+Connecton established with Client...
+Client:hello
+Message: (you type a reply, e.g. bye)
+Client:over</pre></div><div class="ot"><div class="ol">Terminal 2 (client)</div><pre>Message: hello
+Server:hello back
+Message: over
+Server:bye</pre></div></div></div><p><strong>Files:</strong> <code>Server.java</code>, <code>Client.java</code>. I compiled and ran both here with scripted input; the output below is real.</p><p><strong>Unique lines to memorise:</strong> <code>new ServerSocket(7777)</code>, <code>ss.accept()</code>, <code>new Socket(&quot;localhost&quot;, 7777)</code>, <code>getInputStream()</code> / <code>getOutputStream()</code>, and the pair <code>writeUTF</code> / <code>readUTF</code>.</p><details class="grp " open><summary>Aim</summary><div class="gb"><p>To write a client and a server in Java that chat over a TCP connection from two terminals, taking turns, until the client types &quot;over&quot;.</p></div></details><details class="grp "><summary>Theory</summary><div class="gb"><ul><li>A <strong>socket</strong> is one end of a network connection, identified by an IP address and a port number.</li><li>TCP is connection oriented: the server waits, the client connects, and then both sides exchange data over reliable byte streams.</li><li>The server uses <code>ServerSocket(port)</code> to listen. Its <code>accept()</code> call blocks until a client connects and then returns an ordinary <code>Socket</code> for that client.</li><li>The client uses <code>Socket(host, port)</code> to connect. <code>localhost</code> means the same machine.</li><li>Each side gets an input stream and an output stream from its <code>Socket</code>. <code>DataOutputStream.writeUTF</code> sends a string and <code>DataInputStream.readUTF</code> reads it back.</li></ul><p><strong>The Java socket skeleton</strong> (the same shape appears again in Programs 2 and 3)</p><ol><li>Server: create <code>ServerSocket</code>, call <code>accept()</code>, wrap the socket&#x27;s streams, loop reading and writing, close.</li><li>Client: create <code>Socket</code>, wrap the streams, loop writing and reading, close.</li><li>The server must be running first, and both sides must use the same port.</li></ol></div></details><details class="grp proc" open><summary>Procedure</summary><div class="gb"><ol><li>Write <code>Server.java</code> and <code>Client.java</code> in one folder.</li><li>Compile: <code>javac Server.java Client.java</code>.</li><li>Terminal 1: <code>java Server</code>. It prints &quot;Waiting for Connection.....&quot;.</li><li>Terminal 2: <code>java Client</code>.</li><li>Type a message in the client, press Enter, then type the server&#x27;s reply in the server terminal. Repeat.</li><li>Type <code>over</code> in the client to end the chat.</li></ol></div></details><details class="grp codel" open><summary>Code: Server.java</summary><div class="gb"><div class="code"><div class="cbar"><span>java</span><button class="cp" type="button">Copy</button></div><pre><code>import java.net.*;
+import java.io.*;
+
+public class Server {
+    public static void main(String args[]) throws Exception {
+
+        ServerSocket ss = new ServerSocket(7777);
+        System.out.println(&quot;Server Started&quot;);
+        System.out.println(&quot;Waiting for Connection.....&quot;);
+
+        Socket s = ss.accept();
+        System.out.println(&quot;Connecton established with Client...&quot;);
+
+        DataInputStream dat = new DataInputStream(System.in);
+        DataInputStream dis = new DataInputStream(s.getInputStream());
+        DataOutputStream dos = new DataOutputStream(s.getOutputStream());
+
+        String clientMessage = &quot; &quot;;
+        String my_reply = &quot; &quot;;
+
+        while (!(clientMessage.equalsIgnoreCase(&quot;over&quot;))) {
+            clientMessage = dis.readUTF();
+            System.out.println(&quot;Client:&quot; + clientMessage);
+            System.out.println(&quot;Message:&quot;);
+            my_reply = dat.readLine();
+            dos.writeUTF(my_reply);
+        }
+    }
+}</code></pre></div></div></details><details class="grp codel" open><summary>Code: Client.java</summary><div class="gb"><div class="code"><div class="cbar"><span>java</span><button class="cp" type="button">Copy</button></div><pre><code>import java.net.*;
+import java.io.*;
+
+public class Client {
+    public static void main(String args[]) throws Exception {
+
+        Socket s = new Socket(&quot;localhost&quot;, 7777);
+
+        DataInputStream dis = new DataInputStream(System.in);
+        DataOutputStream dos = new DataOutputStream(s.getOutputStream());
+
+        String l = &quot; &quot;;
+        DataInputStream d = new DataInputStream(s.getInputStream());
+        String re = &quot; &quot;;
+
+        while (!(l.equalsIgnoreCase(&quot;over&quot;))) {
+            System.out.println(&quot;Message:&quot;);
+            l = dis.readLine();
+            dos.writeUTF(l);
+            re = d.readUTF();
+            System.out.println(&quot;Server:&quot; + re);
+        }
+
+        s.close();
+        dos.close();
+        d.close();
+    }
+}</code></pre></div></div></details><details class="grp "><summary>Line-by-line explanation</summary><div class="gb"><ul><li><code>ServerSocket ss = new ServerSocket(7777)</code> opens port 7777 and starts listening. <code>ss.accept()</code> then pauses the server until a client connects.</li><li>On the server, <code>dat</code> reads the keyboard (<code>System.in</code>), <code>dis</code> reads what the client sent, and <code>dos</code> writes to the client. The client has the same three streams: <code>dis</code> is its keyboard, <code>d</code> is the input from the server, and <code>dos</code> is the output to the server.</li><li>The loop condition <code>!(clientMessage.equalsIgnoreCase(&quot;over&quot;))</code> stops the chat when the client sends &quot;over&quot; in any letter case.</li><li>The chat is strictly turn based. The client sends first and then waits for a reply, and the server reads, then prompts for its reply, then waits for the next message. Neither side can send twice in a row.</li><li>After the client sends &quot;over&quot;, the server still asks for one last reply, and the client prints it before it exits.</li><li><code>readLine()</code> on a <code>DataInputStream</code> is deprecated, so the compiler prints &quot;uses or overrides a deprecated API&quot;. It is only a note; the program still compiles and runs.</li></ul><p><strong>Expected output</strong> (client typed <code>hello</code> then <code>over</code>; server replied <code>hello back</code> then <code>bye</code>)</p><p>Server terminal:</p><div class="code"><div class="cbar"><span>text</span><button class="cp" type="button">Copy</button></div><pre><code>Server Started
+Waiting for Connection.....
+Connecton established with Client...
+Client:hello
+Message:
+Client:over
+Message:</code></pre></div><p>Client terminal:</p><div class="code"><div class="cbar"><span>text</span><button class="cp" type="button">Copy</button></div><pre><code>Message:
+Server:hello back
+Message:
+Server:bye</code></pre></div></div></details><details class="grp viva"><summary>Viva questions</summary><div class="gb"><ul><li><strong>What is a socket?</strong> One endpoint of a two-way connection, identified by an IP address and a port.</li><li><strong>What does </strong><strong><code>accept()</code></strong><strong> do?</strong> It blocks until a client connects and returns a new <code>Socket</code> for that client.</li><li><strong>ServerSocket versus Socket?</strong> <code>ServerSocket</code> only listens for connections. <code>Socket</code> carries the actual data.</li><li><strong>Why TCP and not UDP for a chat?</strong> TCP gives a reliable, ordered stream with a connection. UDP is connectionless.</li><li><strong>Why must the server start first?</strong> The client connects to a port that the server must already be listening on; otherwise it gets &quot;Connection refused&quot;.</li><li><strong>What does </strong><strong><code>writeUTF</code></strong><strong> do?</strong> It writes a string in a length-prefixed UTF-8 form that <code>readUTF</code> on the other side can read back exactly.</li></ul></div></details><details class="grp err"><summary>Common errors</summary><div class="gb"><ul><li><code>java.net.ConnectException: Connection refused</code>: the client started before the server, or the port numbers differ.</li><li><code>java.net.BindException: Address already in use</code>: an earlier server is still running on port 7777.</li><li>Class name and file name must match: <code>Server</code> in <code>Server.java</code>.</li><li>One side typing twice: the chat is turn based, so wait for the other side&#x27;s prompt.</li></ul></div></details></section><section class="sec" id="p2"><div class="sh"><span class="badge java">P2</span><h2>Program 2: Secure file transfer with a Caesar cipher (Java, TCP)</h2><button class="done" type="button" data-id="p2">Mark revised</button></div><div class="quick"><div class="qa"><h3>How to run</h3><p class="fl">Files: ServerTCP.java, ClientTCP.java (2A)  |  TCPServer.java, TCPClient.java (2B)</p><div class="step"><span class="sl">2A compile</span><div class="cmd"><code>javac ServerTCP.java ClientTCP.java</code><button class="cp" type="button">Copy</button></div></div><div class="step"><span class="sl">2A Terminal 1</span><div class="cmd"><code>java ServerTCP      # type: hello.txt</code><button class="cp" type="button">Copy</button></div></div><div class="step"><span class="sl">2A Terminal 2</span><div class="cmd"><code>java ClientTCP      # type: world.txt</code><button class="cp" type="button">Copy</button></div></div><div class="step"><span class="sl">2B Terminal 1</span><div class="cmd"><code>java TCPServer serv_data 3333</code><button class="cp" type="button">Copy</button></div></div><div class="step"><span class="sl">2B Terminal 2</span><div class="cmd"><code>java TCPClient cli_data localhost 3333</code><button class="cp" type="button">Copy</button></div></div><p class="nt">2A: hello.txt holds 1234, world.txt holds 345. 2B: answer U to upload or D to download, then type the file name.</p></div><div class="qb"><h3>What you will see</h3><div class="ot"><div class="ol">2A files created</div><pre>ClientTXT.txt  -&gt;  4567
+ServerTXT.txt  -&gt;  012</pre></div><div class="ot"><div class="ol">2B server terminal</div><pre>Server started...
+Waiting for connections...
+Client with ID 1 connected from localhost...</pre></div><div class="ot"><div class="ol">2B client terminal</div><pre>Files available on the server:
+file1.txt
+file2.txt
+Enter &#x27;U&#x27; to upload or &#x27;D&#x27; to download: D
+Enter the file name to download: file1.txt
+Download completed.</pre></div></div></div><p>The repo has three versions of this program. <strong>2A (Shortest)</strong> is the one to type first: it is short and shows the idea. <strong>2B (Terminal)</strong> is the fuller version with upload, download and a threaded server. The third folder, <code>2_Secure_File_Transfer</code>, is a Swing GUI version of 2B with the same cipher; skip it.</p><p><strong>Unique lines to memorise:</strong> the cipher itself, <code>(char)(ch + 3)</code> to encrypt and <code>(char)(ch - 3)</code> to decrypt in 2A, and <code>(c + 3) % 256</code> and <code>(c - 3 + 256) % 256</code> in 2B.</p><details class="grp " open><summary>Aim</summary><div class="gb"><p>To transfer files between a client and a server over TCP in Java, encrypting the data with a Caesar cipher (shift of 3) before it is sent and decrypting it on arrival.</p></div></details><details class="grp "><summary>Theory</summary><div class="gb"><ul><li>A <strong>Caesar cipher</strong> shifts every character by a fixed key. With key 3, <code>1</code> becomes <code>4</code> and <code>a</code> becomes <code>d</code>. Decryption shifts back by 3.</li><li>On raw bytes the shift wraps around modulo 256 so the result stays a valid byte: encrypt <code>(c + 3) % 256</code>, decrypt <code>(c - 3 + 256) % 256</code>. The <code>+ 256</code> stops a negative number appearing before the modulo.</li><li>It is a <strong>symmetric</strong> cipher: sender and receiver use the same key. It is easy to break (only 255 possible keys, and letter frequencies give it away), so it is a teaching example, not real security.</li><li>A <strong>threaded server</strong> gives each connected client its own thread, so several clients can be served at once.</li></ul><h4>2A: Shortest version</h4><p><strong>Files:</strong> <code>ServerTCP.java</code>, <code>ClientTCP.java</code>, and two sample text files <code>hello.txt</code> and <code>world.txt</code>.</p></div></details><details class="grp proc" open><summary>Procedure</summary><div class="gb"><ol><li>Create <code>hello.txt</code> containing <code>1234</code> and <code>world.txt</code> containing <code>345</code>.</li><li>Compile: <code>javac ServerTCP.java ClientTCP.java</code>.</li><li>Terminal 1: <code>java ServerTCP</code>. Type <code>hello.txt</code> when it asks for the path.</li><li>Terminal 2: <code>java ClientTCP</code>. Type <code>world.txt</code> when it asks.</li></ol><p>The server sends first, then the client sends. Run the server first.</p></div></details><details class="grp codel" open><summary>Code: ServerTCP.java</summary><div class="gb"><div class="code"><div class="cbar"><span>java</span><button class="cp" type="button">Copy</button></div><pre><code>import java.io.*;
+import java.net.*;
+
+class ServerTCP {
+    public static void main(String args[]) throws Exception {
+        ServerSocket ss = new ServerSocket(7777);
+        System.out.println(&quot;Connecting.....&quot;);
+
+        Socket s = ss.accept();
+        System.out.println(&quot;connected&quot;);
+
+        DataOutputStream dos = new DataOutputStream(s.getOutputStream());
+        BufferedReader dis1 = new BufferedReader(new InputStreamReader(System.in));
+
+        System.out.println(&quot;Enter the path of the File:&quot;);
+        String path = dis1.readLine();
+        FileReader fr = new FileReader(path);
+        int ch;
+
+        while ((ch = fr.read()) != -1) {
+            dos.writeUTF((char) (ch+3) + &quot;&quot;);
+        }
+        dos.writeUTF(&quot;end&quot;);
+
+        FileWriter fw = new FileWriter(&quot;ServerTXT.txt&quot;);
+        DataInputStream dis = new DataInputStream(s.getInputStream());
+        String data;
+
+        while (!(data = dis.readUTF()).equalsIgnoreCase(&quot;end&quot;)) {
+            fw.write(data);
+        }
+
+        fw.close();
+        dos.close();
+        dis.close();
+        s.close();
+        ss.close();
+    }
+}</code></pre></div></div></details><details class="grp codel" open><summary>Code: ClientTCP.java</summary><div class="gb"><div class="code"><div class="cbar"><span>java</span><button class="cp" type="button">Copy</button></div><pre><code>import java.io.*;
+import java.net.*;
+
+class ClientTCP {
+    public static void main(String args[]) throws Exception {
+        Socket s = new Socket(&quot;localhost&quot;, 7777);
+        FileWriter fw = new FileWriter(&quot;ClientTXT.txt&quot;);
+        DataInputStream dis = new DataInputStream(s.getInputStream());
+        String data;
+
+        while (!(data = dis.readUTF()).equalsIgnoreCase(&quot;end&quot;)) {
+            fw.write(data);
+        }
+        fw.close();
+
+        DataOutputStream dos = new DataOutputStream(s.getOutputStream());
+        BufferedReader dis1 = new BufferedReader(new InputStreamReader(System.in));
+        System.out.println(&quot;Enter the path of the File:&quot;);
+        String path = dis1.readLine();
+        FileReader fr = new FileReader(path);
+        int ch;
+
+        while ((ch = fr.read()) != -1) {
+            dos.writeUTF((char) (ch-3) + &quot;&quot;);
+        }
+        dos.writeUTF(&quot;end&quot;);
+
+        fr.close();
+        dos.close();
+        dis.close();
+        s.close();
+    }
+}</code></pre></div></div></details><details class="grp " open><summary>How it works</summary><div class="gb"><ul><li>The server reads its file one character at a time, adds 3 to each, and sends every character as its own <code>writeUTF</code> string. The word <code>end</code> is the marker that the file is finished.</li><li>The client keeps reading strings until it sees <code>end</code>, writing them to <code>ClientTXT.txt</code>. Then it does the same in the other direction: it reads its own file, subtracts 3 from each character, sends them and an <code>end</code>. The server writes them to <code>ServerTXT.txt</code>.</li><li><code>+3</code> going one way and <code>-3</code> going the other makes the two directions use opposite shifts.</li></ul><p><strong>Result when run</strong> (<code>hello.txt</code> = <code>1234</code>, <code>world.txt</code> = <code>345</code>)</p><div class="tw"><table><tr><th>File</th><th>Content</th><th>Why</th></tr><tr><td><code>ClientTXT.txt</code></td><td><code>4567</code></td><td><code>1234</code> shifted by +3 and written as received</td></tr><tr><td><code>ServerTXT.txt</code></td><td><code>012</code></td><td><code>345</code> shifted by -3 and written as received</td></tr></table></div><p>As written, each receiver stores the encrypted text; it does not shift back. If your lab asks for the original text to appear at the other end, apply the reverse shift when writing. I tested this change, and both files then matched the originals (<code>1234</code> and <code>345</code>):</p><div class="code"><div class="cbar"><span>java</span><button class="cp" type="button">Copy</button></div><pre><code>// ClientTCP.java: replace fw.write(data); with
+fw.write(data.charAt(0) - 3);
+
+// ServerTCP.java: replace fw.write(data); with
+fw.write(data.charAt(0) + 3);</code></pre></div><h4>2B: Terminal version with upload, download and threads</h4><p><strong>Files:</strong> <code>TCPServer.java</code> (contains the classes <code>TCPServer</code> and <code>ThreadedServer</code>), <code>TCPClient.java</code>, and two folders of sample files, <code>serv_data</code> and <code>cli_data</code>.</p></div></details><details class="grp proc" open><summary>Procedure</summary><div class="gb"><ol><li>Make two folders, <code>serv_data</code> and <code>cli_data</code>, and put a small text file in each.</li><li>Compile: <code>javac TCPServer.java TCPClient.java</code>.</li><li>Terminal 1: <code>java TCPServer serv_data 3333</code>. The port is optional and defaults to 3333.</li><li>Terminal 2: <code>java TCPClient cli_data localhost 3333</code>. The client prints the server&#x27;s file list.</li><li>Type <code>D</code>, then a file name, to download it into <code>cli_data</code>. Or type <code>U</code>, then a file name from <code>cli_data</code>, to upload it to <code>serv_data</code>.</li></ol></div></details><details class="grp codel" open><summary>Code: TCPServer.java</summary><div class="gb"><div class="code"><div class="cbar"><span>java</span><button class="cp" type="button">Copy</button></div><pre><code>import java.io.*;
+import java.net.*;
+import java.util.*;
+
+public class TCPServer {
+    public static void main(String args[]) throws Exception {
+        if (args.length == 0) {
+            System.out.println(&quot;Please enter the server directory address as the first argument.&quot;);
+            return;
+        }
+
+        int port = (args.length &gt;= 2) ? Integer.parseInt(args[1]) : 3333;
+        String dirName = args[0];
+
+        System.out.println(&quot;Server started...&quot;);
+        System.out.println(&quot;Waiting for connections...&quot;);
+
+        try (ServerSocket welcomeSocket = new ServerSocket(port)) {
+            int id = 1;
+            while (true) {
+                Socket connectionSocket = welcomeSocket.accept();
+                System.out.println(&quot;Client with ID &quot; + id + &quot; connected from &quot; +
+                        connectionSocket.getInetAddress().getHostName() + &quot;...&quot;);
+                Thread server = new ThreadedServer(connectionSocket, id, dirName);
+                id++;
+                server.start();
+            }
+        }
+    }
+}
+
+class ThreadedServer extends Thread {
+    private Socket connectionSocket;
+    private String dirName;
+
+    public ThreadedServer(Socket s, int c, String dir) {
+        this.connectionSocket = s;
+        this.dirName = dir;
+    }
+
+    public void run() {
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
+                OutputStream output = connectionSocket.getOutputStream();
+                PrintWriter out = new PrintWriter(output, true)) {
+
+            File directory = new File(dirName);
+            if (!directory.exists() || !directory.isDirectory()) {
+                System.out.println(&quot;Invalid directory specified.&quot;);
+                return;
+            }
+
+            // Send file list to the client
+            String[] fileList = directory.list();
+            out.println(fileList.length);
+            for (String file : fileList) {
+                out.println(file);
+            }
+
+            String request = in.readLine();
+            if (request == null)
+                return;
+
+            if (request.startsWith(&quot;*&quot;)) { // Download
+                String filename = request.substring(1);
+                File file = new File(dirName, filename);
+                if (file.exists() &amp;&amp; file.isFile()) {
+                    out.println(&quot;Success&quot;);
+                    try (FileInputStream fileInput = new FileInputStream(file)) {
+                        sendBytes(fileInput, output);
+                    }
+                } else {
+                    out.println(&quot;FileNotFound&quot;);
+                }
+            } else { // Upload
+                String filename = request;
+                File file = new File(dirName, filename);
+                try (FileOutputStream fileOut = new FileOutputStream(file)) {
+                    receiveBytes(in, fileOut);
+                }
+                out.println(&quot;UploadSuccess&quot;);
+            }
+        } catch (IOException ex) {
+            System.out.println(&quot;Exception: &quot; + ex.getMessage());
+        }
+    }
+
+    private static void sendBytes(InputStream in, OutputStream out) throws IOException {
+        int c;
+        while ((c = in.read()) != -1) {
+            out.write((c + 3) % 256); // Caesar cipher encryption
+        }
+        out.flush();
+    }
+
+    private static void receiveBytes(BufferedReader in, OutputStream out) throws IOException {
+        int c;
+        while ((c = in.read()) != -1) {
+            out.write((c - 3 + 256) % 256); // Caesar cipher decryption
+        }
+        out.flush();
+    }
+}</code></pre></div></div></details><details class="grp codel" open><summary>Code: TCPClient.java</summary><div class="gb"><div class="code"><div class="cbar"><span>java</span><button class="cp" type="button">Copy</button></div><pre><code>import java.io.*;
+import java.net.*;
+import java.util.Scanner;
+
+public class TCPClient {
+    public static void main(String[] args) {
+        if (args.length &lt; 1) {
+            System.out.println(&quot;Please enter the client directory address as the first argument.&quot;);
+            return;
+        }
+
+        String dirName = args[0];
+        String host = (args.length &gt;= 2) ? args[1] : &quot;localhost&quot;;
+        int port = (args.length &gt;= 3) ? Integer.parseInt(args[2]) : 3333;
+
+        try (Socket clientSocket = new Socket(host, port);
+                InputStream inFromServer = clientSocket.getInputStream();
+                BufferedReader in = new BufferedReader(new InputStreamReader(inFromServer));
+                PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true)) {
+
+            // Receive file list from the server
+            int fileCount = Integer.parseInt(in.readLine());
+            System.out.println(&quot;Files available on the server:&quot;);
+            for (int i = 0; i &lt; fileCount; i++) {
+                System.out.println(in.readLine());
+            }
+
+            Scanner scanner = new Scanner(System.in);
+            System.out.print(&quot;Enter &#x27;U&#x27; to upload or &#x27;D&#x27; to download: &quot;);
+            String action = scanner.nextLine().trim().toUpperCase();
+
+            if (action.equals(&quot;U&quot;)) { // Upload
+                System.out.print(&quot;Enter the file name to upload: &quot;);
+                String filename = scanner.nextLine().trim();
+                File file = new File(dirName, filename);
+                if (file.exists() &amp;&amp; file.isFile()) {
+                    out.println(filename);
+                    try (FileInputStream fileInput = new FileInputStream(file)) {
+                        sendBytes(fileInput, clientSocket.getOutputStream());
+                    }
+                    System.out.println(&quot;Upload completed.&quot;);
+                } else {
+                    System.out.println(&quot;File not found.&quot;);
+                }
+            } else if (action.equals(&quot;D&quot;)) { // Download
+                System.out.print(&quot;Enter the file name to download: &quot;);
+                String filename = scanner.nextLine().trim();
+                out.println(&quot;*&quot; + filename);
+                String response = in.readLine();
+                if (&quot;Success&quot;.equals(response)) {
+                    try (FileOutputStream fileOut = new FileOutputStream(new File(dirName, filename))) {
+                        receiveBytes(inFromServer, fileOut);
+                    }
+                    System.out.println(&quot;Download completed.&quot;);
+                } else {
+                    System.out.println(&quot;File not found on the server.&quot;);
+                }
+            } else {
+                System.out.println(&quot;Invalid action.&quot;);
+            }
+
+        } catch (IOException ex) {
+            System.out.println(&quot;Exception: &quot; + ex.getMessage());
+        }
+    }
+
+    private static void sendBytes(InputStream in, OutputStream out) throws IOException {
+        int c;
+        while ((c = in.read()) != -1) {
+            out.write((c + 3) % 256); // Caesar cipher encryption
+        }
+        out.flush();
+    }
+
+    private static void receiveBytes(InputStream in, OutputStream out) throws IOException {
+        int c;
+        while ((c = in.read()) != -1) {
+            out.write((c - 3 + 256) % 256); // Caesar cipher decryption
+        }
+        out.flush();
+    }
+}</code></pre></div></div></details><details class="grp " open><summary>How it works</summary><div class="gb"><ul><li>When a client connects, the server starts a new <code>ThreadedServer</code> thread for it and goes straight back to <code>accept()</code>. That is what lets several clients connect at once.</li><li>The first thing the server sends is the number of files in its folder, then each file name, one per line.</li><li>The client then sends one line. A line starting with <code>*</code> means download; the name after the star is the file. Any other line is the name of a file the client is about to upload.</li><li><strong>Download:</strong> the server replies <code>Success</code> (or <code>FileNotFound</code>), then streams the file with each byte encrypted. The client decrypts each byte as it writes the file.</li><li><strong>Upload:</strong> the client sends the file name line and then streams the file with each byte encrypted. The server decrypts each byte and writes the file. The data ends when the client closes the connection.</li><li><code>sendBytes</code> and <code>receiveBytes</code> are the whole cipher: one loop that reads a byte, shifts it and writes it.</li></ul></div></details><details class="grp out" open><summary>Expected output</summary><div class="gb"><p>I ran this with a download and an upload; both files arrived identical to the originals.</p><p>Server terminal:</p><div class="code"><div class="cbar"><span>text</span><button class="cp" type="button">Copy</button></div><pre><code>Server started...
+Waiting for connections...
+Client with ID 1 connected from localhost...
+Client with ID 2 connected from localhost...</code></pre></div><p>Client terminal (download):</p><div class="code"><div class="cbar"><span>text</span><button class="cp" type="button">Copy</button></div><pre><code>Files available on the server:
+file2.txt
+file1.txt
+Enter &#x27;U&#x27; to upload or &#x27;D&#x27; to download: Enter the file name to download: Download completed.</code></pre></div><p>The order of the file names comes from the operating system and may differ on your machine.</p></div></details><details class="grp viva"><summary>Viva questions</summary><div class="gb"><ul><li><strong>What is a Caesar cipher?</strong> A substitution cipher that shifts every character by a fixed key; here the key is 3.</li><li><strong>Why </strong><strong><code>% 256</code></strong><strong>?</strong> A byte holds 0 to 255, so the shifted value wraps around and stays a valid byte.</li><li><strong>Why </strong><strong><code>+ 256</code></strong><strong> when decrypting?</strong> Subtracting 3 from a small value would give a negative number, and <code>%</code> of a negative number is negative in Java.</li><li><strong>Symmetric or asymmetric?</strong> Symmetric: the same key encrypts and decrypts.</li><li><strong>Why is it not really secure?</strong> Only 255 possible keys, and character frequencies reveal the shift.</li><li><strong>Why does the server use threads?</strong> One thread per client, so a slow client does not block the others.</li><li><strong>TCP or UDP here, and why?</strong> TCP, because a file needs reliable, ordered delivery.</li><li><strong>How does the server tell upload from download?</strong> A leading <code>*</code> in the request line means download.</li></ul></div></details><details class="grp err"><summary>Common errors</summary><div class="gb"><ul><li>2B needs the folder name as the first argument. Without it both programs print &quot;Please enter the ... directory&quot; and stop.</li><li><code>Connection refused</code>: start the server first, and use the same port on both sides.</li><li>Wrong file name in upload: the client prints &quot;File not found&quot; and the server just closes that connection.</li><li>2A: running the client first leaves it waiting, because the client expects the server to send first.</li><li>Non-text files or characters above ASCII 124 may not survive 2B&#x27;s upload path, because the server reads that path as characters. Plain text files are fine.</li></ul></div></details></section><section class="sec" id="p3"><div class="sh"><span class="badge java">P3</span><h2>Program 3: Remote Method Invocation, RMI (Java)</h2><button class="done" type="button" data-id="p3">Mark revised</button></div><div class="quick"><div class="qa"><h3>How to run</h3><p class="fl">Files: MyServerIntf, MyServerImpl, MyServer, MyClient</p><div class="step"><span class="sl">Compile</span><div class="cmd"><code>javac *.java</code><button class="cp" type="button">Copy</button></div></div><div class="step"><span class="sl">Terminal 1 (same folder)</span><div class="cmd"><code>rmiregistry</code><button class="cp" type="button">Copy</button></div></div><div class="step"><span class="sl">Terminal 2</span><div class="cmd"><code>java MyServer</code><button class="cp" type="button">Copy</button></div></div><div class="step"><span class="sl">Terminal 3</span><div class="cmd"><code>java MyClient</code><button class="cp" type="button">Copy</button></div></div><p class="nt">Leave rmiregistry running. Start it from the folder that holds the .class files.</p></div><div class="qb"><h3>What you will see</h3><div class="ot"><div class="ol">Terminal 2 (server)</div><pre>Server Started...</pre></div><div class="ot"><div class="ol">Terminal 3 (client)</div><pre>Addition: 2500</pre></div></div></div><p><strong>Files:</strong> <code>MyServerIntf.java</code>, <code>MyServerImpl.java</code>, <code>MyServer.java</code>, <code>MyClient.java</code></p><p><strong>Unique lines to memorise:</strong> <code>interface MyServerIntf extends Remote</code>, <code>throws RemoteException</code> on every method, <code>extends UnicastRemoteObject</code>, <code>Naming.rebind(&quot;RMServer&quot;, myserver)</code> on the server and <code>Naming.lookup(&quot;rmi://localhost/RMServer&quot;)</code> on the client.</p><details class="grp " open><summary>Aim</summary><div class="gb"><p>To write a Java program in which a client calls a method that actually runs on a server (here, adding two numbers), using Remote Method Invocation.</p></div></details><details class="grp "><summary>Theory</summary><div class="gb"><ul><li><strong>RMI</strong> lets a Java program call a method on an object that lives in another JVM (possibly another machine) as if it were a local call.</li><li><strong>Remote interface:</strong> declares the methods the client may call. It must extend <code>java.rmi.Remote</code>, and every method must declare <code>throws RemoteException</code>.</li><li><strong>Implementation class:</strong> the server-side class that implements the interface. Extending <code>UnicastRemoteObject</code> makes the object exportable so it can receive remote calls.</li><li><strong>Stub:</strong> a proxy object on the client side. The client calls the stub; the stub sends the call over the network (marshalling the arguments) to the server and returns the result.</li><li><strong>RMI registry:</strong> a small name service. The server registers its object under a name (<code>rebind</code>); the client finds it by that name (<code>lookup</code>). It listens on port 1099 by default and is started with <code>rmiregistry</code>.</li></ul></div></details><details class="grp proc" open><summary>Procedure</summary><div class="gb"><ol><li>Write the four files below in one folder.</li><li>Compile all: <code>javac *.java</code>.</li><li>Terminal 1, start the registry <strong>from the same folder</strong>: <code>rmiregistry</code>. (Leave it running.)</li><li>Terminal 2, start the server: <code>java MyServer</code>. It prints <code>Server Started...</code>.</li><li>Terminal 3, run the client: <code>java MyClient</code>. It prints <code>Addition: 2500</code>.</li></ol></div></details><details class="grp codel" open><summary>Code: MyServerIntf.java</summary><div class="gb"><div class="code"><div class="cbar"><span>java</span><button class="cp" type="button">Copy</button></div><pre><code>import java.rmi.*;
+
+public interface MyServerIntf extends Remote {
+    int add(int a, int b) throws RemoteException;
+}</code></pre></div></div></details><details class="grp codel" open><summary>Code: MyServerImpl.java</summary><div class="gb"><div class="code"><div class="cbar"><span>java</span><button class="cp" type="button">Copy</button></div><pre><code>import java.rmi.*;
+import java.rmi.server.*;
+
+public class MyServerImpl extends UnicastRemoteObject implements MyServerIntf {
+    public MyServerImpl() throws RemoteException {
+        super();
+    }
+
+    public int add(int a, int b) throws RemoteException {
+        return a + b;
+    }
+}</code></pre></div></div></details><details class="grp codel" open><summary>Code: MyServer.java</summary><div class="gb"><div class="code"><div class="cbar"><span>java</span><button class="cp" type="button">Copy</button></div><pre><code>import java.rmi.*;
+
+public class MyServer {
+    public static void main(String args[]) {
+        try {
+            MyServerImpl myserver = new MyServerImpl();
+            Naming.rebind(&quot;RMServer&quot;, myserver);
+            System.out.println(&quot;Server Started...&quot;);
+        } catch (Exception e) {
+            System.out.println(&quot;Exception: &quot; + e);
+        }
+    }
+}</code></pre></div></div></details><details class="grp codel" open><summary>Code: MyClient.java</summary><div class="gb"><div class="code"><div class="cbar"><span>java</span><button class="cp" type="button">Copy</button></div><pre><code>import java.rmi.*;
+
+public class MyClient {
+    public static void main(String args[]) {
+        try {
+            String url = &quot;rmi://localhost/RMServer&quot;;
+            MyServerIntf client = (MyServerIntf) Naming.lookup(url);
+            System.out.println(&quot;Addition: &quot; + client.add(2000, 500));
+        } catch (Exception e) {
+            System.out.println(&quot;Exception: &quot; + e);
+        }
+    }
+}</code></pre></div></div></details><details class="grp "><summary>Line-by-line explanation</summary><div class="gb"><ul><li><code>MyServerIntf</code>: the contract. The client only knows this interface, never the implementation.</li><li><code>MyServerImpl</code>: does the real work. <code>super()</code> exports the object so it can accept calls. The constructor must declare <code>throws RemoteException</code> because <code>super()</code> can throw it.</li><li><code>Naming.rebind(&quot;RMServer&quot;, myserver)</code>: puts the object in the registry under the name <code>RMServer</code>. <code>rebind</code> replaces an old entry; <code>bind</code> would fail if the name already existed.</li><li><code>Naming.lookup(url)</code>: asks the registry for the object and returns a stub. It is cast to the interface type.</li><li><code>client.add(2000, 500)</code>: looks like a local call, but runs on the server. The result 2500 comes back over the network.</li></ul></div></details><details class="grp out" open><summary>Expected output</summary><div class="gb"><p>I ran this on one machine with all three terminals.</p><div class="code"><div class="cbar"><span>text</span><button class="cp" type="button">Copy</button></div><pre><code>Terminal 2 (server):  Server Started...
+Terminal 3 (client):  Addition: 2500</code></pre></div></div></details><details class="grp viva"><summary>Viva questions</summary><div class="gb"><ul><li><strong>What is RMI?</strong> A Java mechanism for calling methods on objects in another JVM.</li><li><strong>What is a stub?</strong> The client-side proxy that forwards the call to the server and returns the result.</li><li><strong>What does the registry do?</strong> It maps names to remote objects so clients can find them. Default port 1099.</li><li><strong>Why must the interface extend </strong><strong><code>Remote</code></strong><strong>?</strong> It marks the interface as callable remotely.</li><li><strong>Why </strong><strong><code>throws RemoteException</code></strong><strong>?</strong> Network calls can fail, so every remote method must declare it.</li><li><strong><code>bind</code></strong><strong> vs </strong><strong><code>rebind</code></strong><strong>?</strong> <code>bind</code> throws an error if the name is taken; <code>rebind</code> overwrites it.</li><li><strong>What is </strong><strong><code>UnicastRemoteObject</code></strong><strong>?</strong> The base class that exports the object so it can receive remote calls over TCP.</li><li><strong>How are arguments sent?</strong> They are serialised (marshalled), sent, and deserialised on the other side.</li></ul></div></details><details class="grp err"><summary>Common errors</summary><div class="gb"><ul><li><code>Connection refused</code>: the registry is not running. Start <code>rmiregistry</code> first.</li><li><code>ClassNotFoundException</code>: start <code>rmiregistry</code> from the folder that contains the compiled <code>.class</code> files, or set <code>CLASSPATH</code> for it.</li><li><code>NotBoundException</code>: the name in <code>lookup</code> does not match the name in <code>rebind</code> (they are case-sensitive), or the server was not started.</li><li><code>Port already in use</code> or <code>BindException</code>: an old registry or server is still running. Stop it first.</li><li>Forgetting <code>throws RemoteException</code> on the interface method gives a compile error.</li><li>Newer Java versions have removed the security manager, so you do not need a policy file or <code>System.setSecurityManager</code>.</li></ul></div></details></section><section class="sec" id="p4"><div class="sh"><span class="badge ns2">P4</span><h2>Program 4: Wired network simulation with TCP and UDP traffic (NS2)</h2><button class="done" type="button" data-id="p4">Mark revised</button></div><div class="quick"><div class="qa"><h3>How to run</h3><p class="fl">Files: wired.tcl, analyse.awk</p><div class="step"><span class="sl">Run simulation</span><div class="cmd"><code>ns wired.tcl</code><button class="cp" type="button">Copy</button></div></div><div class="step"><span class="sl">Analyse trace</span><div class="cmd"><code>awk -f analyse.awk wired.tr</code><button class="cp" type="button">Copy</button></div></div><div class="step"><span class="sl">Animation (optional)</span><div class="cmd"><code>nam wired.nam</code><button class="cp" type="button">Copy</button></div></div><p class="nt">Writes wired.tr and wired.nam. Use the corrected awk from this section.</p></div><div class="qb"><h3>What you will see</h3><div class="ot"><div class="ol">ns wired.tcl</div><pre>Simulation is starting...</pre></div><div class="ot"><div class="ol">awk result</div><pre>Packets sent (enqueued at n0 and n2) = 4804
+TCP packets received at n5 = 2392
+Throughput = 2.49503e+06 bits/sec
+Packets dropped = 0</pre></div></div></div><p><strong>Files:</strong> <code>wired.tcl</code>, <code>analyse.awk</code> (the repo&#x27;s awk is buggy; use the corrected one below)</p><p><strong>Unique lines to memorise:</strong> the five <code>duplex-link</code> lines (the bottleneck is <code>n1</code>-<code>n4</code> at 3Mb), <code>new Agent/UDP</code> + <code>new Agent/Null</code> + <code>Application/Traffic/CBR</code> for the UDP flow, <code>new Agent/TCP</code> + <code>new Agent/TCPSink</code> + <code>Application/FTP</code> for the TCP flow, and the start times 1.0 and 2.0.</p><details class="grp " open><summary>Aim</summary><div class="gb"><p>To simulate a wired network of six nodes that carries one UDP flow and one TCP flow at the same time, and to measure the packets received, the throughput and the packets dropped from the trace file.</p></div></details><details class="grp "><summary>Theory</summary><div class="gb"><ul><li><strong>UDP + CBR:</strong> UDP is connectionless and gives no delivery guarantee. <code>CBR</code> (constant bit rate) is the traffic generator that sends fixed-size packets at a steady rate. The receiver is an <code>Agent/Null</code>, which simply discards what arrives.</li><li><strong>TCP + FTP:</strong> TCP is reliable and uses congestion control. <code>FTP</code> is the application that keeps sending data as fast as TCP allows. The receiver is a <code>TCPSink</code>, which sends the ACKs.</li><li><strong>DropTail:</strong> a queue that drops the newest packet when it is full.</li><li><strong>Bottleneck:</strong> the slowest link on a path (here <code>n1</code>-<code>n4</code> at 3 Mb) limits throughput, and the queue before it is where packets get dropped.</li><li><strong>Throughput</strong> = total bits received / time over which they were received.</li></ul></div></details><details class="grp " open><summary>Topology</summary><div class="gb"><div class="code"><div class="cbar"><span>text</span><button class="cp" type="button">Copy</button></div><pre><code>n0 --5Mb,2ms-- n1 --3Mb,10ms-- n4 --100Mb,2ms-- n3
+n2 --10Mb,5ms-- n1              n4 --4Mb,10ms--- n5
+
+UDP/CBR:  n0 -&gt; n3   starts at 1.0 s
+TCP/FTP:  n2 -&gt; n5   starts at 2.0 s
+Simulation ends at 10.0 s</code></pre></div></div></details><details class="grp proc" open><summary>Procedure</summary><div class="gb"><ol><li>Save the script as <code>wired.tcl</code> and the awk script as <code>analyse.awk</code>.</li><li>Run the simulation: <code>ns wired.tcl</code>. It prints <code>Simulation is starting...</code> and writes <code>wired.tr</code> and <code>wired.nam</code>.</li><li>Analyse the trace: <code>awk -f analyse.awk wired.tr</code>.</li><li>Optional: view the animation with <code>nam wired.nam</code>.</li></ol></div></details><details class="grp codel" open><summary>Code: wired.tcl</summary><div class="gb"><div class="code"><div class="cbar"><span>tcl</span><button class="cp" type="button">Copy</button></div><pre><code>set ns [new Simulator]
+
+set tracefile [open wired.tr w]
+$ns trace-all $tracefile
+
+set namfile [open wired.nam w]
+$ns namtrace-all $namfile
+
+set n0 [$ns node]
+set n1 [$ns node]
+set n2 [$ns node]
+set n3 [$ns node]
+set n4 [$ns node]
+set n5 [$ns node]
+
+$ns duplex-link $n0 $n1 5Mb 2ms DropTail
+$ns duplex-link $n2 $n1 10Mb 5ms DropTail
+$ns duplex-link $n1 $n4 3Mb 10ms DropTail
+$ns duplex-link $n4 $n3 100Mb 2ms DropTail
+$ns duplex-link $n4 $n5 4Mb 10ms DropTail
+
+# UDP flow: node 0 to node 3
+set udp [new Agent/UDP]
+set null [new Agent/Null]
+$ns attach-agent $n0 $udp
+$ns attach-agent $n3 $null
+$ns connect $udp $null
+
+# TCP flow: node 2 to node 5
+set tcp [new Agent/TCP]
+set sink [new Agent/TCPSink]
+$ns attach-agent $n2 $tcp
+$ns attach-agent $n5 $sink
+$ns connect $tcp $sink
+
+set cbr [new Application/Traffic/CBR]
+$cbr attach-agent $udp
+
+set ftp [new Application/FTP]
+$ftp attach-agent $tcp
+
+$ns at 1.0 &quot;$cbr start&quot;
+$ns at 2.0 &quot;$ftp start&quot;
+$ns at 10.0 &quot;finish&quot;
+
+proc finish {} {
+ global ns tracefile namfile
+ $ns flush-trace
+ close $tracefile
+ close $namfile
+ exit 0
+}
+
+puts &quot;Simulation is starting...&quot;
+$ns run</code></pre></div></div></details><details class="grp codel" open><summary>Code: analyse.awk (corrected)</summary><div class="gb"><div class="code"><div class="cbar"><span>awk</span><button class="cp" type="button">Copy</button></div><pre><code>BEGIN { sent=0; recv=0; dropped=0; bytes=0; first=0; last=0; flag=0 }
+{
+    if ($1 == &quot;+&quot; &amp;&amp; ($3 == 0 || $3 == 2)) sent++
+    if ($1 == &quot;r&quot; &amp;&amp; $5 == &quot;tcp&quot; &amp;&amp; $4 == 5) {
+        recv++; bytes += $6
+        if (flag == 0) { first = $2; flag = 1 }
+        last = $2
+    }
+    if ($1 == &quot;d&quot;) dropped++
+}
+END {
+    print &quot;Packets sent (enqueued at n0 and n2) =&quot;, sent
+    print &quot;TCP packets received at n5 =&quot;, recv
+    print &quot;Throughput =&quot;, bytes*8/(last-first), &quot;bits/sec&quot;
+    print &quot;Packets dropped =&quot;, dropped
+}</code></pre></div></div></details><details class="grp "><summary>Line-by-line explanation</summary><div class="gb"><ul><li><strong>Step 1, simulator:</strong> <code>new Simulator</code> creates the event scheduler.</li><li><strong>Step 2, trace files:</strong> <code>trace-all</code> logs every packet event to <code>wired.tr</code>; <code>namtrace-all</code> writes the animation file.</li><li><strong>Step 3, nodes:</strong> six <code>$ns node</code> calls give <code>n0</code> to <code>n5</code>.</li><li><strong>Step 4, links:</strong> <code>duplex-link a b bandwidth delay queue</code> makes a two-way link. All use <code>DropTail</code>.</li><li><strong>Step 5, agents:</strong> an agent is the transport endpoint. UDP sends to <code>Null</code>; TCP sends to <code>TCPSink</code>. <code>attach-agent</code> places it on a node and <code>connect</code> pairs the two ends.</li><li><strong>Step 6, applications:</strong> CBR generates the UDP packets; FTP generates the TCP data. Each is attached to its agent.</li><li><strong>Step 7, events:</strong> <code>$ns at time &quot;command&quot;</code> schedules the start of each flow and the call to <code>finish</code>.</li><li><strong>Step 8, finish:</strong> flushes and closes the files and exits. Without <code>exit</code>, the run never ends properly.</li><li><strong>awk:</strong> <code>$1</code> event, <code>$2</code> time, <code>$3</code> from node, <code>$4</code> to node, <code>$5</code> packet type, <code>$6</code> size in bytes. The script counts packets enqueued at <code>n0</code> and <code>n2</code> (what was sent), TCP packets received at <code>n5</code>, and every <code>d</code> line as a drop. Throughput is the bits received divided by the time between the first and the last reception.</li></ul></div></details><details class="grp out" open><summary>Expected output</summary><div class="gb"><p>I ran this in NS2 (version 2.35). The numbers will be about the same on your machine:</p><div class="code"><div class="cbar"><span>text</span><button class="cp" type="button">Copy</button></div><pre><code>Packets sent (enqueued at n0 and n2) = 4804
+TCP packets received at n5 = 2392
+Throughput = 2.49503e+06 bits/sec
+Packets dropped = 0</code></pre></div><p>The TCP throughput is about 2.5 Mb/s. It is below the 3 Mb/s bottleneck because the UDP flow shares that link. The drop count was 0 in my run; if your numbers differ a little, the method is still the same.</p></div></details><details class="grp viva"><summary>Viva questions</summary><div class="gb"><ul><li><strong>What is the difference between UDP and TCP in this program?</strong> UDP/CBR just sends and never checks; TCP/FTP is acknowledged and slows down when it senses congestion.</li><li><strong>Why is </strong><strong><code>Agent/Null</code></strong><strong> used?</strong> It is a sink that discards UDP packets; UDP needs no replies.</li><li><strong>What does </strong><strong><code>DropTail</code></strong><strong> mean?</strong> When the queue is full, the arriving packet is dropped.</li><li><strong>Where would packets be dropped here?</strong> At the queue in front of the slowest link (<code>n1</code>-<code>n4</code>).</li><li><strong>What are the trace-file columns?</strong> Event, time, from node, to node, type, size, flags, flow id, source, destination, sequence number, packet id.</li><li><strong>What do </strong><strong><code>+</code></strong><strong>, </strong><strong><code>-</code></strong><strong>, </strong><strong><code>r</code></strong><strong>, </strong><strong><code>d</code></strong><strong> mean?</strong> Enqueue, dequeue, receive, drop.</li><li><strong>How is throughput computed?</strong> Total bytes received times 8, divided by the receiving time.</li><li><strong>What is NAM?</strong> The Network Animator, which plays the <code>.nam</code> file as an animation.</li></ul></div></details><details class="grp err"><summary>Common errors</summary><div class="gb"><ul><li>The repo&#x27;s <code>analyse.awk</code> gives a negative throughput and counts every received packet on every link; use the corrected version above.</li><li><code>ns: command not found</code>: NS2 is not installed or not on the PATH.</li><li>Forgetting <code>exit 0</code> in <code>finish</code>, or forgetting <code>$ns at 10.0 &quot;finish&quot;</code>, leaves the run hanging or the trace file incomplete.</li><li>Using <code>$ns</code> inside <code>finish</code> without <code>global ns</code> gives a &quot;can&#x27;t read ns&quot; error.</li><li>Tcl is strict about spaces: <code>$ns duplex-link $n0 $n1 5Mb 2ms DropTail</code> must have each word separated.</li><li>Opening the trace with <code>open wired.tr</code> (no <code>w</code>) fails; the mode <code>w</code> is needed.</li></ul></div></details></section><section class="sec" id="p5"><div class="sh"><span class="badge ns2">P5</span><h2>Program 5: Wireless (ad hoc) network simulation with AODV (NS2)</h2><button class="done" type="button" data-id="p5">Mark revised</button></div><div class="quick"><div class="qa"><h3>How to run</h3><p class="fl">Files: wireless.tcl, analysis.awk</p><div class="step"><span class="sl">Run simulation</span><div class="cmd"><code>ns wireless.tcl</code><button class="cp" type="button">Copy</button></div></div><div class="step"><span class="sl">Analyse trace</span><div class="cmd"><code>awk -f analysis.awk wireless.tr</code><button class="cp" type="button">Copy</button></div></div><div class="step"><span class="sl">Animation (optional)</span><div class="cmd"><code>nam wireless.nam</code><button class="cp" type="button">Copy</button></div></div><p class="nt">Takes up to a minute and writes a trace of about 6 MB.</p></div><div class="qb"><h3>What you will see</h3><div class="ot"><div class="ol">ns wireless.tcl</div><pre>Starting Simulation
+num_nodes is set 6
+highestAntennaZ_ = 1.5,  distCST_ = 550.0</pre></div><div class="ot"><div class="ol">awk result</div><pre>Generated Packets = 7851
+Received Packets = 7674
+Packet Delivery Ratio = 97.7455%
+Total Dropped Packets = 31
+Average End-to-End Delay = 162.639 ms</pre></div></div></div><p><strong>Files:</strong> <code>wireless.tcl</code>, <code>analysis.awk</code>, <code>netconfig.tcl</code></p><p><code>netconfig.tcl</code> is only a copy of the <code>val</code> block and the <code>node-config</code> command from <code>wireless.tcl</code>, kept as a separate file. You do not need it to run the program; <code>wireless.tcl</code> is complete on its own.</p><p><strong>Unique lines to memorise:</strong> the <code>val(...)</code> block, <code>namtrace-all-wireless</code>, <code>create-god $val(nn)</code>, the <code>node-config</code> block, <code>$n0 set X_ / Y_ / Z_</code>, and <code>$ns at 1.0 &quot;$n1 setdest 490.0 340.0 25.0&quot;</code>.</p><details class="grp " open><summary>Aim</summary><div class="gb"><p>To simulate a mobile ad hoc network of six wireless nodes that move around, carry TCP and UDP traffic, and find routes with AODV, and to compute the packet delivery ratio, drops and average end-to-end delay from the trace file.</p></div></details><details class="grp "><summary>Theory</summary><div class="gb"><ul><li><strong>Wireless ad hoc network:</strong> nodes talk directly by radio with no fixed access point; nodes in the middle forward packets for others.</li><li><strong>AODV (Ad hoc On-Demand Distance Vector):</strong> a routing protocol that finds a route only when a packet needs one, by flooding a route request (RREQ) and getting a route reply (RREP). When a link breaks it sends a route error (RERR).</li><li><strong>IEEE 802.11 (</strong><strong><code>Mac/802_11</code></strong><strong>):</strong> the wireless MAC. It uses CSMA/CA, with RTS/CTS and ACK frames, to avoid collisions.</li><li><strong>TwoRayGround:</strong> a radio propagation model that combines the direct signal and the signal reflected from the ground; it decides which nodes can hear each other.</li><li><strong>Topography:</strong> the flat area in which nodes sit (here 500 x 500 m).</li><li><strong>GOD (General Operations Director):</strong> an NS2 object that keeps global knowledge of the nodes; wireless simulations need it.</li><li><strong><code>setdest x y speed</code></strong><strong>:</strong> tells a node to move to (x, y) at the given speed (m/s) starting at that time.</li><li><strong>Packet delivery ratio (PDR)</strong> = packets received / packets generated x 100.</li></ul></div></details><details class="grp proc" open><summary>Procedure</summary><div class="gb"><ol><li>Save the script as <code>wireless.tcl</code> and the awk script as <code>analysis.awk</code>.</li><li>Run: <code>ns wireless.tcl</code>. It prints <code>Starting Simulation</code> and writes <code>wireless.tr</code> (about 6 MB) and <code>wireless.nam</code>. Wait; it takes a few seconds to a minute.</li><li>Analyse: <code>awk -f analysis.awk wireless.tr</code>.</li><li>Optional: <code>nam wireless.nam</code>.</li></ol></div></details><details class="grp " open><summary>Topology and events</summary><div class="gb"><div class="code"><div class="cbar"><span>text</span><button class="cp" type="button">Copy</button></div><pre><code>Start positions (x, y):
+ n0 (10,20)   n1 (210,230)   n2 (100,200)
+ n3 (150,230) n4 (430,320)   n5 (270,120)
+
+Movement:
+ at 1.0   n1 -&gt; (490,340) at 25 m/s
+ at 1.0   n4 -&gt; (300,130) at 5 m/s
+ at 1.0   n5 -&gt; (190,440) at 15 m/s
+ at 20.0  n5 -&gt; (100,200) at 30 m/s
+
+Traffic:
+ TCP/FTP  n0 -&gt; n5   starts at 1.0
+ UDP/CBR  n2 -&gt; n3   starts at 1.0
+ Simulation ends at 30.0 s</code></pre></div></div></details><details class="grp codel" open><summary>Code: wireless.tcl</summary><div class="gb"><div class="code"><div class="cbar"><span>tcl</span><button class="cp" type="button">Copy</button></div><pre><code>set val(chan)   Channel/WirelessChannel
+set val(prop)   Propagation/TwoRayGround
+set val(netif)  Phy/WirelessPhy
+set val(mac)    Mac/802_11
+set val(ifq)    Queue/DropTail/PriQueue
+set val(ll)     LL
+set val(ant)    Antenna/OmniAntenna
+set val(ifqlen) 50
+set val(nn)     6
+set val(rp)     AODV
+set val(x)      500
+set val(y)      500
+
+set ns [new Simulator]
+
+set tracefile [open wireless.tr w]
+$ns trace-all $tracefile
+
+set namfile [open wireless.nam w]
+$ns namtrace-all-wireless $namfile $val(x) $val(y)
+
+set topo [new Topography]
+$topo load_flatgrid $val(x) $val(y)
+
+create-god $val(nn)
+
+set channel1 [new $val(chan)]
+
+$ns node-config \
+  -adhocRouting $val(rp) \
+  -llType $val(ll) \
+  -macType $val(mac) \
+  -ifqType $val(ifq) \
+  -ifqLen $val(ifqlen) \
+  -antType $val(ant) \
+  -propType $val(prop) \
+  -phyType $val(netif) \
+  -topoInstance $topo \
+  -agentTrace ON \
+  -macTrace ON \
+  -routerTrace ON \
+  -movementTrace ON \
+  -channel $channel1
+
+set n0 [$ns node]
+set n1 [$ns node]
+set n2 [$ns node]
+set n3 [$ns node]
+set n4 [$ns node]
+set n5 [$ns node]
+
+$n0 random-motion 0
+$n1 random-motion 0
+$n2 random-motion 0
+$n3 random-motion 0
+$n4 random-motion 0
+$n5 random-motion 0
+
+$ns initial_node_pos $n0 20
+$ns initial_node_pos $n1 20
+$ns initial_node_pos $n2 20
+$ns initial_node_pos $n3 20
+$ns initial_node_pos $n4 20
+$ns initial_node_pos $n5 50
+
+$n0 set X_ 10.0
+$n0 set Y_ 20.0
+$n0 set Z_ 0.0
+$n1 set X_ 210.0
+$n1 set Y_ 230.0
+$n1 set Z_ 0.0
+$n2 set X_ 100.0
+$n2 set Y_ 200.0
+$n2 set Z_ 0.0
+$n3 set X_ 150.0
+$n3 set Y_ 230.0
+$n3 set Z_ 0.0
+$n4 set X_ 430.0
+$n4 set Y_ 320.0
+$n4 set Z_ 0.0
+$n5 set X_ 270.0
+$n5 set Y_ 120.0
+$n5 set Z_ 0.0
+
+$ns at 1.0 &quot;$n1 setdest 490.0 340.0 25.0&quot;
+$ns at 1.0 &quot;$n4 setdest 300.0 130.0 5.0&quot;
+$ns at 1.0 &quot;$n5 setdest 190.0 440.0 15.0&quot;
+$ns at 20.0 &quot;$n5 setdest 100.0 200.0 30.0&quot;
+
+set tcp [new Agent/TCP]
+set sink [new Agent/TCPSink]
+$ns attach-agent $n0 $tcp
+$ns attach-agent $n5 $sink
+$ns connect $tcp $sink
+set ftp [new Application/FTP]
+$ftp attach-agent $tcp
+$ns at 1.0 &quot;$ftp start&quot;
+
+set udp [new Agent/UDP]
+set null [new Agent/Null]
+$ns attach-agent $n2 $udp
+$ns attach-agent $n3 $null
+$ns connect $udp $null
+set cbr [new Application/Traffic/CBR]
+$cbr attach-agent $udp
+$ns at 1.0 &quot;$cbr start&quot;
+
+$ns at 30.0 &quot;finish&quot;
+
+proc finish {} {
+ global ns tracefile namfile
+ $ns flush-trace
+ close $tracefile
+ close $namfile
+ exit 0
+}
+
+puts &quot;Starting Simulation&quot;
+$ns run</code></pre></div><p>The repo version also has comments, and it creates two extra channels (<code>channel2</code>, <code>channel3</code>) that are never used; I left them out. The script above is the shortened form I ran.</p></div></details><details class="grp codel" open><summary>Code: analysis.awk</summary><div class="gb"><div class="code"><div class="cbar"><span>awk</span><button class="cp" type="button">Copy</button></div><pre><code>BEGIN {
+    seqno = -1;
+    droppedPackets = 0;
+    receivedPackets = 0;
+    totalDelay = 0;
+    validPackets = 0;
+}
+
+{
+    if($4 == &quot;AGT&quot; &amp;&amp; $1 == &quot;s&quot;) {
+        seqno = $6 &gt; seqno ? $6 : seqno;
+        start_time[$6] = $2;
+    }
+    else if($4 == &quot;AGT&quot; &amp;&amp; $1 == &quot;r&quot;) {
+        receivedPackets++;
+        totalDelay += $2 - start_time[$6];
+        validPackets++;
+    }
+    else if($1 == &quot;D&quot; &amp;&amp; $7 == &quot;tcp&quot; &amp;&amp; $8 &gt; 512) {
+        droppedPackets++;
+    }
+}
+
+END {
+    generatedPackets = seqno + 1;
+    packetDeliveryRatio = (receivedPackets / generatedPackets) * 100;
+    avgEndToEndDelay = (validPackets &gt; 0) ? (totalDelay / validPackets) * 1000 : 0;
+
+    print &quot;\nGenerated Packets = &quot; generatedPackets;
+    print &quot;Received Packets = &quot; receivedPackets;
+    print &quot;Packet Delivery Ratio = &quot; packetDeliveryRatio &quot;%&quot;;
+    print &quot;Total Dropped Packets = &quot; droppedPackets;
+    print &quot;Average End-to-End Delay = &quot; avgEndToEndDelay &quot; ms\n&quot;;
+}</code></pre></div></div></details><details class="grp "><summary>Line-by-line explanation</summary><div class="gb"><ul><li><strong><code>val(...)</code></strong><strong> block:</strong> one variable per setting, so the later commands read cleanly: channel type, propagation model, network interface, MAC, queue, link layer, antenna, queue length, node count, routing protocol and area size.</li><li><strong><code>namtrace-all-wireless file x y</code></strong><strong>:</strong> the wireless version of <code>namtrace-all</code>; it needs the area size.</li><li><strong><code>Topography</code></strong><strong> and </strong><strong><code>load_flatgrid</code></strong><strong>:</strong> define the 500 x 500 m flat area.</li><li><strong><code>create-god n</code></strong><strong>:</strong> creates the GOD for <code>n</code> nodes.</li><li><strong><code>node-config</code></strong><strong>:</strong> sets the properties that every node created after it will have: routing, link layer, MAC, queue, antenna, propagation, PHY, topography and the channel, and turns on tracing at agent, MAC, router and movement levels. It must come <strong>before</strong> the <code>$ns node</code> calls.</li><li><strong><code>random-motion 0</code></strong><strong>:</strong> switches off NS2&#x27;s random movement; the nodes move only when told to.</li><li><strong><code>initial_node_pos node size</code></strong><strong>:</strong> the drawn size of the node in NAM; it does not change behaviour.</li><li><strong><code>set X_ / Y_ / Z_</code></strong><strong>:</strong> the starting coordinates. Keep them inside 500 x 500.</li><li><strong><code>setdest</code></strong><strong>:</strong> move a node to a new point at a given speed, scheduled with <code>$ns at</code>. A node can be moved more than once (<code>n5</code> is moved again at 20.0).</li><li><strong>Agents and apps:</strong> the same as Program 4. TCP/FTP runs <code>n0</code> to <code>n5</code> across the network; UDP/CBR runs <code>n2</code> to <code>n3</code> as background traffic.</li><li><strong>awk:</strong> in the wireless trace, <code>$1</code> is the event (<code>s</code> send, <code>r</code> receive, <code>D</code> drop), <code>$2</code> the time, <code>$4</code> the layer (<code>AGT</code> is the application agent), <code>$6</code> the packet id, <code>$7</code> the packet type, <code>$8</code> the size. The script records the send time of each packet id, adds up delay on each receive, counts TCP drops larger than 512 bytes, and computes PDR and average delay.</li></ul></div></details><details class="grp out" open><summary>Expected output</summary><div class="gb"><p>I ran this in NS2 (version 2.35):</p><div class="code"><div class="cbar"><span>text</span><button class="cp" type="button">Copy</button></div><pre><code>Generated Packets = 7851
+Received Packets = 7674
+Packet Delivery Ratio = 97.7455%
+Total Dropped Packets = 31
+Average End-to-End Delay = 162.639 ms</code></pre></div><p>Your numbers may differ a little. Do not worry about matching them exactly.</p><p><strong>Caveat about the awk:</strong> &quot;Generated&quot; is the highest packet id plus one. Packet ids are shared by all packets in the run (TCP, UDP and routing), so this is an approximation, but it is what the lab script does, so use it as given.</p></div></details><details class="grp viva"><summary>Viva questions</summary><div class="gb"><ul><li><strong>What is an ad hoc network?</strong> A network of mobile nodes with no fixed infrastructure; they route for one another.</li><li><strong>How does AODV work?</strong> It finds a route on demand: RREQ is flooded, RREP comes back along the path, and RERR reports a broken link.</li><li><strong>Why is GOD needed?</strong> It holds global information about the nodes that NS2 uses (for example, the number of nodes) in wireless runs.</li><li><strong>What does </strong><strong><code>node-config</code></strong><strong> do and why before creating nodes?</strong> It sets the properties of every node created after it.</li><li><strong>What is </strong><strong><code>setdest</code></strong><strong>?</strong> A command to move a node to (x, y) at a given speed from a given time.</li><li><strong>Which MAC is used?</strong> IEEE 802.11 with CSMA/CA.</li><li><strong>What does TwoRayGround model?</strong> Signal strength from the direct path plus the ground-reflected path.</li><li><strong>How is PDR calculated?</strong> Packets received / packets generated x 100.</li><li><strong>Why might packets be dropped?</strong> Collisions, a node moving out of range, route breaks, or a full interface queue.</li></ul></div></details><details class="grp err"><summary>Common errors</summary><div class="gb"><ul><li>Placing <code>node-config</code> after the nodes are created: the nodes get default settings and the simulation fails or behaves wrongly.</li><li>Using <code>namtrace-all</code> instead of <code>namtrace-all-wireless</code> in a wireless script.</li><li>Giving a coordinate above 500 when the area is 500 x 500: the node is outside the topography and NS2 stops with an error.</li><li>A line continuation backslash <code>\</code> in <code>node-config</code> must be the last character on its line, with no space after it.</li><li>Forgetting <code>create-god</code> gives an error about GOD not being found.</li><li>Waiting too little: the 30-second simulation writes a large trace and takes a while; the awk step reads about 6 MB.</li></ul></div></details></section><section class="sec" id="p6a"><div class="sh"><span class="badge ns2">P6A</span><h2>Program 6A: Flow control</h2><button class="done" type="button" data-id="p6a">Mark revised</button></div><div class="quick"><div class="qa"><h3>How to run</h3><p class="fl">Files: flow_control.tcl, flow_control_analysis.awk</p><div class="step"><span class="sl">Run simulation</span><div class="cmd"><code>ns flow_control.tcl</code><button class="cp" type="button">Copy</button></div></div><div class="step"><span class="sl">Analyse trace</span><div class="cmd"><code>awk -f flow_control_analysis.awk trace1.tr</code><button class="cp" type="button">Copy</button></div></div><div class="step"><span class="sl">Plots</span><div class="cmd"><code>xgraph Throughput     # and: xgraph Bandwidth</code><button class="cp" type="button">Copy</button></div></div><p class="nt">xgraph and nam open as windows at the end. If they are not installed you get an exec error after the files are written; run the awk anyway.</p></div><div class="qb"><h3>What you will see</h3><div class="ot"><div class="ol">awk result</div><pre>**********HTTP***********
+start time 1.461403
+end time 3.236153
+data 70760.000000
+throughput 39870.404282
+delay 1.774750</pre></div></div></div><p><strong>Files:</strong> <code>flow_control.tcl</code>, <code>flow_control_analysis.awk</code></p><p><strong>Unique lines to memorise:</strong> the RED link, <code>Application/Traffic/Exponential</code> as the source, and the <code>record</code> procedure.</p><details class="grp " open><summary>Aim</summary><div class="gb"><p>To study flow control in TCP by simulating a sender and receiver over a three-node network, plotting throughput and bandwidth with xgraph, and calculating throughput and delay from the trace file with awk.</p></div></details><details class="grp "><summary>Theory</summary><div class="gb"><p>Flow control stops a fast sender from overwhelming a slow receiver. TCP does it with a sliding window: the receiver advertises how much buffer space it has (the receiver window, <code>rwnd</code>), and the sender never keeps more unacknowledged data in flight than the window allows. In NS2 the advertised window is the parameter <code>window_</code>, 20 packets by default. Congestion control (Program 6B) is different: it protects the network, not the receiver.</p></div></details><details class="grp proc" open><summary>Procedure</summary><div class="gb"><ol><li>Create the simulator and open <code>trace1.tr</code>, <code>opnam.nam</code>, and two data files <code>Throughput</code> and <code>Bandwidth</code>.</li><li>Create three nodes and two 1 Mb links: n0 to n1 with DropTail, n1 to n2 with RED.</li><li>Attach a TCP agent to n0 and a TCPSink to n2 and connect them.</li><li>Attach an exponential on/off traffic source to the TCP agent. Start it at 0.2 s and stop it at 3.2 s.</li><li>Write <code>record</code> to sample received bytes every 0.1 s into the two data files. Start it at 0.5 s.</li><li>Call <code>finish</code> at 5.0 s, which closes the files and opens xgraph and nam.</li><li>Run <code>ns flow_control.tcl</code>, then <code>awk -f flow_control_analysis.awk trace1.tr</code>.</li></ol></div></details><details class="grp " open><summary>Topology</summary><div class="gb"><div class="code"><div class="cbar"><span>text</span><button class="cp" type="button">Copy</button></div><pre><code>n0 ---- 1Mb, 10ms, DropTail ---- n1 ---- 1Mb, 10ms, RED ---- n2
+TCP source                                                    TCP sink</code></pre></div></div></details><details class="grp codel" open><summary>Code: flow_control.tcl</summary><div class="gb"><div class="code"><div class="cbar"><span>tcl</span><button class="cp" type="button">Copy</button></div><pre><code>set ns [new Simulator]
+
+set tf [open trace1.tr w]
+$ns trace-all $tf
+set nf [open opnam.nam w]
+$ns namtrace-all $nf
+
+set ft [open &quot;Throughput&quot; &quot;w&quot;]
+set fb [open &quot;Bandwidth&quot; &quot;w&quot;]
+
+for {set i 0} {$i &lt; 3} {incr i} {
+    set n($i) [$ns node]
+}
+
+$ns duplex-link $n(0) $n(1) 1Mb 10ms DropTail
+$ns duplex-link $n(1) $n(2) 1Mb 10ms RED
+
+set tcp [new Agent/TCP]
+set null [new Agent/TCPSink]
+$ns attach-agent $n(0) $tcp
+$ns attach-agent $n(2) $null
+$ns connect $tcp $null
+
+set http [new Application/Traffic/Exponential]
+$http attach-agent $tcp
+
+$ns at 0.2 &quot;$http start&quot;
+$ns at 3.2 &quot;$http stop&quot;
+
+proc finish {} {
+    global ns nf ft fb
+    $ns flush-trace
+    close $nf
+    close $ft
+    close $fb
+    exec xgraph Throughput &amp;
+    exec xgraph Bandwidth &amp;
+    puts &quot;running nam...&quot;
+    exec nam opnam.nam &amp;
+    exit 0
+}
+
+proc record {} {
+    global ft fb null
+    set ns [Simulator instance]
+    set time 0.1
+    set now [$ns now]
+    set bw [$null set bytes_]
+    puts $ft &quot;$now [expr $bw/$time*8/1000000]&quot;
+    puts $fb &quot;$now [expr $bw]&quot;
+    $null set bytes_ 0
+    $ns at [expr $now+$time] &quot;record&quot;
+}
+
+$ns at 0.5 &quot;record&quot;
+$ns at 5.0 &quot;finish&quot;
+$ns run</code></pre></div></div></details><details class="grp codel" open><summary>Code: flow_control_analysis.awk</summary><div class="gb"><div class="code"><div class="cbar"><span>awk</span><button class="cp" type="button">Copy</button></div><pre><code>BEGIN { st1=0; ft1=0; flag1=0; data1=0 }
+{
+    if ($1==&quot;r&quot; &amp;&amp; $4==2) {
+        data1 += $6
+        if (flag1==0) { st1=$2; flag1=1 }
+        ft1 = $2
+    }
+}
+END {
+    printf(&quot;**********HTTP***********\n&quot;)
+    printf(&quot;start time %f\n&quot;, st1)
+    printf(&quot;end time %f\n&quot;, ft1)
+    printf(&quot;data %f\n&quot;, data1)
+    delay1 = ft1 - st1
+    printf(&quot;throughput %f\n&quot;, data1/delay1)
+    printf(&quot;delay %f\n&quot;, delay1)
+}</code></pre></div><p>The repo version has <code>$4==7</code>. This topology has only nodes 0 to 2, so that never matches and the script divides by zero. The sink is node 2.</p></div></details><details class="grp "><summary>Line-by-line explanation</summary><div class="gb"><ul><li><code>for {set i 0} {$i &lt; 3} ...</code> creates nodes <code>n(0)</code>, <code>n(1)</code>, <code>n(2)</code> in a loop.</li><li>Two <code>duplex-link</code> lines build a chain. The second link uses RED, which starts dropping packets randomly before its queue is full, so the sender sees loss early.</li><li><code>Agent/TCP</code> is the sender; <code>Agent/TCPSink</code> is the receiver and returns ACKs. The sink is named <code>null</code> only by habit; it is not a Null agent.</li><li><code>Application/Traffic/Exponential</code> sends at a fixed rate during &quot;on&quot; periods and is silent during &quot;off&quot; periods, both with exponentially distributed lengths. It is called <code>http</code> in the script only as a label.</li><li><code>record</code> reads <code>bytes_</code>, the byte counter inside the sink, converts it to Mbps with <code>bw/time*8/1000000</code>, writes it, resets the counter to 0, and reschedules itself 0.1 s later.</li><li><code>finish</code> runs at 5.0 s, two seconds after the source stops, so the queues and ACKs have time to drain.</li></ul></div></details><details class="grp out" open><summary>Expected output</summary><div class="gb"><ul><li>xgraph <code>Throughput</code>: a bursty line, because the source is on/off. It starts from 0.5 s (when <code>record</code> begins), and falls to zero after about 3.2 s.</li><li>xgraph <code>Bandwidth</code>: the same shape, in bytes per 0.1 s instead of Mbps.</li><li>nam: packets moving n0 to n2, with some drops visible at the RED link when the queue builds.</li><li>awk: start time near 0.2 s, end time after 3.2 s, total data in bytes, throughput in bytes per second, and delay (last receive minus first receive). Exact values change with the random on/off pattern.</li></ul></div></details><details class="grp viva"><summary>Viva questions</summary><div class="gb"><ul><li><strong>Flow control versus congestion control?</strong> Flow control protects the receiver from a fast sender (receiver window). Congestion control protects the network from too much total traffic (congestion window).</li><li><strong>Where is the window in NS2?</strong> <code>window_</code> on the TCP agent, 20 packets by default. The sender transmits at most the minimum of the congestion window and this window.</li><li><strong>DropTail versus RED?</strong> DropTail drops arriving packets only when the queue is full. RED drops randomly with rising probability as the average queue grows, to signal congestion early.</li><li><strong>Why </strong><strong><code>Exponential</code></strong><strong> traffic?</strong> It models bursty sources: on/off periods with random lengths.</li><li><strong>What does </strong><strong><code>record</code></strong><strong> measure?</strong> Bytes received at the sink in each 0.1 s interval, converted to Mbps.</li><li><strong>Why start </strong><strong><code>record</code></strong><strong> at 0.5 s when the source starts at 0.2 s?</strong> The script simply begins sampling later, so the first 0.3 s of traffic is not plotted.</li></ul></div></details><details class="grp err"><summary>Common errors</summary><div class="gb"><ul><li>awk filter on a node that does not exist (<code>$4==7</code>): fix to <code>$4==2</code>.</li><li>xgraph not installed: the script exits with an <code>exec</code> error after closing files; the trace and data files are still written, so run awk anyway.</li><li>Forgetting <code>global</code> in <code>finish</code> or <code>record</code> gives &quot;can&#x27;t read variable&quot; errors.</li></ul></div></details></section><section class="sec" id="p6b"><div class="sh"><span class="badge ns2">P6B</span><h2>Program 6B: Congestion control (Tahoe, Reno, NewReno, Sack, Vegas)</h2><button class="done" type="button" data-id="p6b">Mark revised</button></div><div class="quick"><div class="qa"><h3>How to run</h3><p class="fl">Files: congestion_control.tcl, congestion_control_analysis.awk</p><div class="step"><span class="sl">Run simulation</span><div class="cmd"><code>ns congestion_control.tcl</code><button class="cp" type="button">Copy</button></div></div><div class="step"><span class="sl">Analyse trace</span><div class="cmd"><code>awk -f congestion_control_analysis.awk TCPcc.tr</code><button class="cp" type="button">Copy</button></div></div><div class="step"><span class="sl">Plots</span><div class="cmd"><code>xgraph Tahoe_Sender_throughput Reno_Sender_throughput ...</code><button class="cp" type="button">Copy</button></div></div><p class="nt">Five senders (Tahoe, Reno, NewReno, Sack, Vegas) share the network. Compare their curves in xgraph.</p></div><div class="qb"><h3>What you will see</h3><div class="ot"><div class="ol">awk result</div><pre>**********HTTP***********
+Start time 2.159751
+End time 15.945351
+Data 126480.000000
+Throughput 9174.791086
+Delay 13.785600</pre></div></div></div><p><strong>Files:</strong> <code>congestion_control.tcl</code>, <code>congestion_control_analysis.awk</code>. Short version: <code>congestion_control_UNIFIED.tcl</code>.</p><p><strong>Unique lines to memorise:</strong> the five agent class names (<code>Agent/TCP/Vegas</code>, <code>Agent/TCP/Reno</code>, <code>Agent/TCP/Newreno</code>, <code>Agent/TCP/Sack1</code>, and plain <code>Agent/TCP</code> for Tahoe), and the staggered start and stop times.</p><details class="grp " open><summary>Aim</summary><div class="gb"><p>To simulate TCP Vegas, Reno, NewReno, Sack and Tahoe over the same six-node network and compare their throughput and bandwidth using xgraph and awk.</p></div></details><details class="grp "><summary>Theory</summary><div class="gb"><p>TCP controls how fast it sends with a congestion window, <code>cwnd</code>. It sends at most the smaller of <code>cwnd</code> and the receiver window.</p><ul><li>Slow start: <code>cwnd</code> doubles every round trip until it reaches the threshold <code>ssthresh</code>.</li><li>Congestion avoidance: above <code>ssthresh</code>, <code>cwnd</code> grows by about one packet per round trip.</li><li>On loss, <code>ssthresh</code> is cut and <code>cwnd</code> shrinks. The variants differ in how.</li></ul><div class="tw"><table><tr><th>Variant</th><th>NS2 class</th><th>Reaction to loss</th></tr><tr><td>Tahoe</td><td><code>Agent/TCP</code></td><td><code>cwnd</code> drops to 1 packet and slow start restarts</td></tr><tr><td>Reno</td><td><code>Agent/TCP/Reno</code></td><td>Fast retransmit, then fast recovery: <code>cwnd</code> is halved, not reset to 1</td></tr><tr><td>NewReno</td><td><code>Agent/TCP/Newreno</code></td><td>Reno, but stays in recovery until every packet lost from that window is recovered</td></tr><tr><td>Sack</td><td><code>Agent/TCP/Sack1</code></td><td>Uses selective acknowledgements to retransmit only the missing packets</td></tr><tr><td>Vegas</td><td><code>Agent/TCP/Vegas</code></td><td>Delay based: compares expected and actual throughput and slows down before loss occurs</td></tr></table></div></div></details><details class="grp proc" open><summary>Procedure</summary><div class="gb"><ol><li>Create the simulator, <code>TCPcc.tr</code>, <code>TCPcc.nam</code>, and ten data files (a throughput and a bandwidth file per variant).</li><li>Create six nodes and six links of 10 Kb to 200 Kb, mixing DropTail and RED.</li><li>For each variant, create the TCP agent and a TCPSink, attach, connect, and attach an exponential traffic source.</li><li>Start each source in its own 3 second slot: Vegas 0.2 to 3.2, Reno 3.2 to 6.2, NewReno 6.2 to 9.2, Sack 9.2 to 12.2, Tahoe 12.2 to 15.2.</li><li><code>record</code> samples all five sinks every 0.1 s into the data files.</li><li>Run <code>ns congestion_control.tcl</code>, then <code>awk -f congestion_control_analysis.awk TCPcc.tr</code>.</li></ol></div></details><details class="grp " open><summary>Topology</summary><div class="gb"><div class="code"><div class="cbar"><span>text</span><button class="cp" type="button">Copy</button></div><pre><code>n0 --10Kb-- n1 --50Kb-- n2 --200Kb (RED)-- n5
+ |                                          |
+100Kb (RED)                              100Kb
+ |                                          |
+n3 --------------70Kb------------------- n4 ----</code></pre></div><p>All link delays are 10 ms. The links are deliberately slow so queues overflow and the congestion behaviour shows.</p></div></details><details class="grp codel" open><summary>Code: congestion_control.tcl</summary><div class="gb"><div class="code"><div class="cbar"><span>tcl</span><button class="cp" type="button">Copy</button></div><pre><code>set ns [new Simulator]
+$ns color 3 Green
+
+set tf [open TCPcc.tr w]
+$ns trace-all $tf
+set nf [open TCPcc.nam w]
+$ns namtrace-all $nf
+
+set ft1 [open vegas_Sender_throughput w]
+set ft2 [open Reno_Sender_throughput w]
+set ft3 [open Newreno_Sender_throughput w]
+set ft4 [open Sack1_Sender_throughput w]
+set ft5 [open Tahoe_Sender_throughput w]
+
+set fb1 [open vegas_Sender_bandwidth w]
+set fb2 [open Reno_Sender_bandwidth w]
+set fb3 [open Newreno_Sender_bandwidth w]
+set fb4 [open Sack1_Sender_bandwidth w]
+set fb5 [open Tahoe_Sender_bandwidth w]
+
+proc finish {} {
+    global ns nf ft1 ft2 ft3 ft4 ft5 fb1 fb2 fb3 fb4 fb5
+    $ns flush-trace
+    close $nf
+    close $ft1; close $ft2; close $ft3; close $ft4; close $ft5
+    close $fb1; close $fb2; close $fb3; close $fb4; close $fb5
+    exec xgraph vegas_Sender_throughput Reno_Sender_throughput Newreno_Sender_throughput Sack1_Sender_throughput Tahoe_Sender_throughput &amp;
+    exec xgraph vegas_Sender_bandwidth Reno_Sender_bandwidth Newreno_Sender_bandwidth Sack1_Sender_bandwidth Tahoe_Sender_bandwidth &amp;
+    exec nam TCPcc.nam &amp;
+    exit 0
+}
+
+proc record {} {
+    global null1 null2 null3 null4 null5 ft1 ft2 ft3 ft4 ft5 fb1 fb2 fb3 fb4 fb5
+    set ns [Simulator instance]
+    set time 0.1
+    set now [$ns now]
+    set bw1 [$null1 set bytes_]
+    set bw2 [$null2 set bytes_]
+    set bw3 [$null3 set bytes_]
+    set bw4 [$null4 set bytes_]
+    set bw5 [$null5 set bytes_]
+    puts $ft1 &quot;$now [expr $bw1/$time*8/1000000]&quot;
+    puts $ft2 &quot;$now [expr $bw2/$time*8/1000000]&quot;
+    puts $ft3 &quot;$now [expr $bw3/$time*8/1000000]&quot;
+    puts $ft4 &quot;$now [expr $bw4/$time*8/1000000]&quot;
+    puts $ft5 &quot;$now [expr $bw5/$time*8/1000000]&quot;
+    puts $fb1 &quot;$now [expr $bw1]&quot;
+    puts $fb2 &quot;$now [expr $bw2]&quot;
+    puts $fb3 &quot;$now [expr $bw3]&quot;
+    puts $fb4 &quot;$now [expr $bw4]&quot;
+    puts $fb5 &quot;$now [expr $bw5]&quot;
+    $null1 set bytes_ 0
+    $null2 set bytes_ 0
+    $null3 set bytes_ 0
+    $null4 set bytes_ 0
+    $null5 set bytes_ 0
+    $ns at [expr $now+$time] &quot;record&quot;
+}
+
+for {set i 0} {$i &lt; 6} {incr i} {
+    set n($i) [$ns node]
+}
+
+$ns duplex-link $n(0) $n(1) 10Kb 10ms DropTail
+$ns duplex-link $n(0) $n(3) 100Kb 10ms RED
+$ns duplex-link $n(1) $n(2) 50Kb 10ms DropTail
+$ns duplex-link $n(2) $n(5) 200Kb 10ms RED
+$ns duplex-link $n(3) $n(4) 70Kb 10ms DropTail
+$ns duplex-link $n(4) $n(5) 100Kb 10ms DropTail
+
+set tcp1 [new Agent/TCP/Vegas]
+set null1 [new Agent/TCPSink]
+$ns attach-agent $n(0) $tcp1
+$ns attach-agent $n(5) $null1
+$ns connect $tcp1 $null1
+set http1 [new Application/Traffic/Exponential]
+$http1 attach-agent $tcp1
+
+set tcp2 [new Agent/TCP/Reno]
+set null2 [new Agent/TCPSink]
+$ns attach-agent $n(1) $tcp2
+$ns attach-agent $n(5) $null2
+$ns connect $tcp2 $null2
+set http2 [new Application/Traffic/Exponential]
+$http2 attach-agent $tcp2
+
+set tcp3 [new Agent/TCP/Newreno]
+set null3 [new Agent/TCPSink]
+$ns attach-agent $n(2) $tcp3
+$ns attach-agent $n(5) $null3
+$ns connect $tcp3 $null3
+set http3 [new Application/Traffic/Exponential]
+$http3 attach-agent $tcp3
+
+set tcp4 [new Agent/TCP/Sack1]
+set null4 [new Agent/TCPSink]
+$ns attach-agent $n(3) $tcp4
+$ns attach-agent $n(4) $null4
+$ns connect $tcp4 $null4
+set http4 [new Application/Traffic/Exponential]
+$http4 attach-agent $tcp4
+
+set tcp5 [new Agent/TCP]
+set null5 [new Agent/TCPSink]
+$ns attach-agent $n(3) $tcp5
+$ns attach-agent $n(5) $null5
+$ns connect $tcp5 $null5
+set http5 [new Application/Traffic/Exponential]
+$http5 attach-agent $tcp5
+
+$ns at 0.5 &quot;record&quot;
+$ns at 0.2  &quot;$http1 start&quot;
+$ns at 3.2  &quot;$http1 stop&quot;
+$ns at 3.2  &quot;$http2 start&quot;
+$ns at 6.2  &quot;$http2 stop&quot;
+$ns at 6.2  &quot;$http3 start&quot;
+$ns at 9.2  &quot;$http3 stop&quot;
+$ns at 9.2  &quot;$http4 start&quot;
+$ns at 12.2 &quot;$http4 stop&quot;
+$ns at 12.2 &quot;$http5 start&quot;
+$ns at 15.2 &quot;$http5 stop&quot;
+$ns at 16.0 &quot;finish&quot;
+$ns run</code></pre></div></div></details><details class="grp codel" open><summary>Code: congestion_control_analysis.awk</summary><div class="gb"><div class="code"><div class="cbar"><span>awk</span><button class="cp" type="button">Copy</button></div><pre><code>BEGIN { st1=0; ft1=0; flag1=0; data1=0 }
+{
+    if ($1==&quot;r&quot; &amp;&amp; $4==5) {
+        data1 += $6
+        if (flag1==0) { st1=$2; flag1=1 }
+        ft1 = $2
+    }
+}
+END {
+    printf(&quot;**********HTTP***********\n&quot;)
+    printf(&quot;Start time %f\n&quot;, st1)
+    printf(&quot;End time %f\n&quot;, ft1)
+    printf(&quot;Data %f\n&quot;, data1)
+    delay1 = ft1 - st1
+    printf(&quot;Throughput %f\n&quot;, data1/delay1)
+    printf(&quot;Delay %f\n&quot;, delay1)
+}</code></pre></div><p><strong>Short version for the exam.</strong> <code>congestion_control_UNIFIED.tcl</code> is the same network with one sender (n3 to n5) and one pair of data files. Copy the skeleton, build the six-node topology, and change only the agent class (<code>Agent/TCP</code> for Tahoe, <code>Agent/TCP/Reno</code> and so on) to test a variant. Its first line in the repo says <code>VERIFICATION PENDING</code>, so run it once before relying on it.</p></div></details><details class="grp "><summary>Line-by-line explanation</summary><div class="gb"><ul><li>Five sender and sink pairs, one per variant. Each sink is its own <code>TCPSink</code> so each has its own <code>bytes_</code> counter.</li><li>The variants run one after another, not at the same time. The graphs compare each variant on the same network in its own time slot; they do not compete for bandwidth.</li><li><code>record</code> is the same idea as in 6A but samples five sinks and writes ten files. xgraph overlays the five throughput files in one window and the five bandwidth files in another.</li><li>Sack caveat: a true SACK setup pairs <code>Agent/TCP/Sack1</code> with <code>Agent/TCPSink/Sack1</code>. With the plain <code>TCPSink</code> used here, the sender gets no SACK blocks, so it behaves much like Reno.</li><li>The Sack flow runs from n3 to n4, so it ends at node 4 and the awk filter on node 5 does not count it.</li></ul></div></details><details class="grp out" open><summary>Expected output</summary><div class="gb"><ul><li>Two xgraph windows with five coloured lines. Each line is non-zero only in its own 3 second slot.</li><li>The throughput values are small (kilobit links), so the Mbps scale is tiny. The bandwidth plot in bytes is easier to read.</li><li>awk prints one combined throughput and delay for everything received at n5.</li></ul></div></details><details class="grp viva"><summary>Viva questions</summary><div class="gb"><ul><li><strong>Tahoe versus Reno?</strong> On loss Tahoe resets <code>cwnd</code> to 1 and slow-starts. Reno halves <code>cwnd</code> and continues in congestion avoidance through fast recovery.</li><li><strong>What does NewReno fix?</strong> Reno leaves fast recovery after the first retransmit, so multiple losses in one window hurt it. NewReno stays in recovery until all of them are fixed.</li><li><strong>What does SACK add?</strong> The receiver reports which blocks arrived, so the sender retransmits only the missing packets.</li><li><strong>How is Vegas different?</strong> It reacts to rising delay, not to loss, so it avoids congestion before packets are dropped.</li><li><strong>Slow start versus congestion avoidance?</strong> Exponential growth up to <code>ssthresh</code>, then linear growth.</li><li><strong>Why different start times?</strong> So the five variants do not compete and each curve can be read on its own.</li></ul></div></details><details class="grp err"><summary>Common errors</summary><div class="gb"><ul><li>Typing <code>Agent/TCP/NewReno</code>: the class is <code>Agent/TCP/Newreno</code>.</li><li>Forgetting to close a data file in <code>finish</code>, which leaves xgraph with an empty or partial file.</li><li>Reading the awk output as per-variant numbers. It is a single combined figure.</li></ul></div></details></section><section class="sec" id="p7"><div class="sh"><span class="badge ns2">P7</span><h2>Program 7: Distance Vector and Link State routing</h2><button class="done" type="button" data-id="p7">Mark revised</button></div><div class="quick"><div class="qa"><h3>How to run</h3><p class="fl">Files: DV.tcl, LS.tcl, analysis.awk</p><div class="step"><span class="sl">Distance Vector</span><div class="cmd"><code>ns DV.tcl</code><button class="cp" type="button">Copy</button></div></div><div class="step"><span class="sl">Analyse DV</span><div class="cmd"><code>awk -f analysis.awk out_dv.tr</code><button class="cp" type="button">Copy</button></div></div><div class="step"><span class="sl">Link State</span><div class="cmd"><code>ns LS.tcl</code><button class="cp" type="button">Copy</button></div></div><div class="step"><span class="sl">Analyse LS</span><div class="cmd"><code>awk -f analysis.awk out_ls.tr</code><button class="cp" type="button">Copy</button></div></div><p class="nt">The link between two nodes goes down at 2.0 s and up at 3.0 s. The routes change and the traffic recovers.</p></div><div class="qb"><h3>What you will see</h3><div class="ot"><div class="ol">awk result (DV)</div><pre>Start Time: 0.530640
+End Time: 4.975461
+Data: 651080.000000 bytes
+Throughput: 146480.589432 bytes/sec
+Delay: 4.444821 sec</pre></div></div></div><p><strong>Files:</strong> <code>DV.tcl</code>, <code>LS.tcl</code>, <code>analysis.awk</code>. Short versions: <code>DV_SHORT.tcl</code>, <code>analysis_SHORT.awk</code>.</p><p><strong>Unique lines to memorise:</strong> <code>$ns rtproto DV</code> (or <code>LS</code>), and the pair <code>$ns rtmodel-at 2.0 down $node(2) $node(3)</code> and <code>$ns rtmodel-at 3.0 up $node(2) $node(3)</code>.</p><details class="grp " open><summary>Aim</summary><div class="gb"><p>To simulate Distance Vector and Link State routing on a seven-node ring, fail a link during a TCP transfer, and observe how each protocol reroutes the traffic and recovers.</p></div></details><details class="grp "><summary>Theory</summary><div class="gb"><ul><li><strong>Distance Vector (DV):</strong> each router tells its neighbours its distance to every destination, and updates its own table with the Bellman-Ford rule. It only knows the next hop and cost, not the whole map. Used in RIP. Slower to converge and can suffer count-to-infinity.</li><li><strong>Link State (LS):</strong> each router floods information about its own links to every router, so all routers hold the same map and each runs Dijkstra&#x27;s shortest path algorithm. Used in OSPF. Converges faster but uses more memory and flooding traffic.</li><li>NS2 uses static routing by default. <code>rtproto DV</code> or <code>rtproto LS</code> switches on a dynamic routing protocol, which is what lets the network react to a link failure.</li></ul></div></details><details class="grp proc" open><summary>Procedure</summary><div class="gb"><ol><li>Create the simulator and select the protocol with <code>$ns rtproto DV</code> (Program <code>LS.tcl</code> uses <code>LS</code>).</li><li>Create seven nodes in a ring, each linked to the next with 1.5 Mb, 10 ms DropTail links (node 6 links back to node 0).</li><li>Attach a TCP agent to node 0 and a TCPSink to node 3 and connect them. Add FTP on the TCP agent.</li><li>Start FTP at 0.5 s. Bring the link between node 2 and node 3 down at 2.0 s and up again at 3.0 s. Stop FTP at 4.9 s and finish at 5.0 s.</li><li><code>record</code> writes the sink&#x27;s throughput every 0.1 s into <code>dvr_th</code> (or <code>lsr_th</code>).</li><li>Run <code>ns DV.tcl</code>, then <code>ns LS.tcl</code>. Compare the two graphs and the nam animations.</li><li>Analyse with <code>awk -f analysis.awk out_dv.tr</code>.</li></ol></div></details><details class="grp " open><summary>Topology</summary><div class="gb"><div class="code"><div class="cbar"><span>text</span><button class="cp" type="button">Copy</button></div><pre><code>            n0 -- n1 -- n2 -- n3
+            |                  |
+            n6 -- n5 -- n4 ----+
+
+FTP from n0 to n3.
+Normal path:      n0 - n1 - n2 - n3         (3 hops)
+After n2-n3 fails: n0 - n6 - n5 - n4 - n3   (4 hops)</code></pre></div><p><strong>Code: DV.tcl</strong> (the repo version with the cosmetic colour and label lines removed; the logic is unchanged)</p><div class="code"><div class="cbar"><span>tcl</span><button class="cp" type="button">Copy</button></div><pre><code>set ns [new Simulator]
+$ns rtproto DV
+
+set tf [open out_dv.tr w]
+$ns trace-all $tf
+set nf [open out_dv.nam w]
+$ns namtrace-all $nf
+set ft [open &quot;dvr_th&quot; &quot;w&quot;]
+
+for {set i 0} {$i &lt; 7} {incr i} {
+    set node($i) [$ns node]
+}
+
+for {set i 0} {$i &lt; 7} {incr i} {
+    set j [expr ($i+1) % 7]
+    $ns duplex-link $node($i) $node($j) 1.5Mb 10ms DropTail
+}
+
+set tcp [new Agent/TCP]
+$ns attach-agent $node(0) $tcp
+set sink [new Agent/TCPSink]
+$ns attach-agent $node(3) $sink
+$ns connect $tcp $sink
+
+set ftp [new Application/FTP]
+$ftp attach-agent $tcp
+
+proc record {} {
+    global sink ft
+    set ns [Simulator instance]
+    set time 0.1
+    set now [$ns now]
+    set bw [$sink set bytes_]
+    puts $ft &quot;$now [expr $bw/$time*8/1000000]&quot;
+    $sink set bytes_ 0
+    $ns at [expr $now+$time] &quot;record&quot;
+}
+
+proc finish {} {
+    global ns tf nf ft
+    $ns flush-trace
+    close $tf
+    close $nf
+    close $ft
+    exec nam out_dv.nam &amp;
+    exec xgraph dvr_th &amp;
+    exit 0
+}
+
+$ns at 0.55 &quot;record&quot;
+$ns at 0.5 &quot;$ftp start&quot;
+$ns rtmodel-at 2.0 down $node(2) $node(3)
+$ns rtmodel-at 3.0 up $node(2) $node(3)
+$ns at 4.9 &quot;$ftp stop&quot;
+$ns at 5.0 &quot;finish&quot;
+$ns run</code></pre></div><p><strong>LS.tcl is the same file with four changes:</strong> <code>$ns rtproto LS</code>, the trace and nam names <code>out_ls.tr</code> and <code>out_ls.nam</code>, the throughput file <code>lsr_th</code>, and <code>exec nam out_ls.nam &amp;</code> with <code>exec xgraph lsr_th &amp;</code> in <code>finish</code>.</p></div></details><details class="grp codel" open><summary>Code: analysis.awk</summary><div class="gb"><div class="code"><div class="cbar"><span>awk</span><button class="cp" type="button">Copy</button></div><pre><code>BEGIN { st1=0; ft1=0; flag1=0; data1=0 }
+{
+    if ($1 == &quot;r&quot; &amp;&amp; $4 == 3 &amp;&amp; $5 == &quot;tcp&quot;) {
+        data1 += $6
+        if (flag1 == 0) { st1 = $2; flag1 = 1 }
+        ft1 = $2
+    }
+}
+END {
+    printf(&quot;Start Time: %f\n&quot;, st1)
+    printf(&quot;End Time: %f\n&quot;, ft1)
+    printf(&quot;Data: %f bytes\n&quot;, data1)
+    delay1 = ft1 - st1
+    printf(&quot;Throughput: %f bytes/sec\n&quot;, data1/delay1)
+    printf(&quot;Delay: %f sec\n&quot;, delay1)
+}</code></pre></div><p>The repo version filters on flow id 7 (<code>$4 == 7</code>), which does not exist in this topology. The sink is node 3, and <code>$5 == &quot;tcp&quot;</code> keeps routing-protocol packets out of the count.</p></div></details><details class="grp "><summary>Line-by-line explanation</summary><div class="gb"><ul><li><code>for ... duplex-link $node($i) $node($j)</code> with <code>j = (i+1) % 7</code> builds the ring in a loop; the modulo closes it by linking node 6 to node 0. This is the short way to type the topology.</li><li><code>rtmodel-at 2.0 down $node(2) $node(3)</code> takes the link between those two nodes out of service at 2.0 s; <code>up</code> restores it at 3.0 s.</li><li>At 2.0 s TCP packets on that link are lost, the routing protocol detects the failure, recomputes the path the other way round the ring, and TCP recovers through retransmission.</li><li><code>record</code> and <code>finish</code> are the same as in 6A. <code>finish</code> now also closes <code>ft</code>, so xgraph reads a complete file.</li></ul></div></details><details class="grp out" open><summary>Expected output</summary><div class="gb"><ul><li>Throughput graph: steady from about 0.5 s, drops to zero around 2.0 s when the link fails, resumes once routing converges and TCP retransmits, and then continues at a similar rate on the longer path.</li><li>nam: packets flow n0, n1, n2, n3 at first, then the other way round via n6, n5, n4 after the failure.</li><li>The gap before recovery is the convergence time. Link State typically recovers faster than Distance Vector because it floods the change directly. Check this on your own two graphs.</li></ul></div></details><details class="grp viva"><summary>Viva questions</summary><div class="gb"><ul><li><strong>DV versus LS?</strong> DV shares distance tables with neighbours only and uses Bellman-Ford. LS floods link information to all routers and each runs Dijkstra on the full map.</li><li><strong>Why does NS2 need </strong><strong><code>rtproto</code></strong><strong>?</strong> Default routing is static and cannot react to failures; <code>rtproto</code> turns on a dynamic protocol.</li><li><strong>What is count-to-infinity?</strong> A DV problem where routers keep increasing the cost of a dead route by passing stale information between each other.</li><li><strong>Which protocols use these?</strong> RIP is distance vector; OSPF is link state.</li><li><strong>Why does throughput drop to zero at 2.0 s?</strong> The link is down, routes have not converged yet, and TCP is waiting for retransmission timeouts.</li><li><strong>Which path is used after the failure?</strong> The longer path n0, n6, n5, n4, n3.</li></ul></div></details><details class="grp err"><summary>Common errors</summary><div class="gb"><ul><li>Missing <code>rtproto</code>: the link failure is then never handled and the transfer just stops.</li><li><code>rtmodel-at</code> argument order: time, then <code>down</code> or <code>up</code>, then the two nodes.</li><li>Not closing <code>ft</code> in <code>finish</code>, so xgraph shows an empty or partial plot.</li></ul></div></details></section><section class="sec" id="p8"><div class="sh"><span class="badge ns2">P8</span><h2>Program 8: Multicasting</h2><button class="done" type="button" data-id="p8">Mark revised</button></div><div class="quick"><div class="qa"><h3>How to run</h3><p class="fl">Files: multicast.tcl (or multicast_SHORT.tcl)</p><div class="step"><span class="sl">Run simulation</span><div class="cmd"><code>ns multicast.tcl</code><button class="cp" type="button">Copy</button></div></div><div class="step"><span class="sl">Animation</span><div class="cmd"><code>nam mcast.nam      # opens by itself at the end</code><button class="cp" type="button">Copy</button></div></div><p class="nt">There is no awk step. The output is the animation and the trace output.tr. Watch the receivers join and leave the groups.</p></div><div class="qb"><h3>What you will see</h3><div class="ot"><div class="ol">What the run produces</div><pre>output.tr  -&gt;  about 39,000 lines
+mcast.nam  -&gt;  animation
+
+Packets received per node (from output.tr):
+  node 3 : 2677    node 4 : 2288
+  node 5 : 1670    node 6 : 1717    node 7 : 1732</pre></div></div></div><p><strong>Files:</strong> <code>multicast.tcl</code>. Short version: <code>multicast_SHORT.tcl</code>.</p><p><strong>Unique lines to memorise:</strong> <code>new Simulator -multicast on</code>, <code>$ns mrtproto DM {}</code>, <code>[Node allocaddr]</code> for group addresses, <code>set dst_addr_ $group</code>, and <code>join-group</code> / <code>leave-group</code>.</p><details class="grp " open><summary>Aim</summary><div class="gb"><p>To simulate multicast communication using Dense Mode routing, where two sources each send to a group address and receivers join and leave the groups during the run.</p></div></details><details class="grp "><summary>Theory</summary><div class="gb"><ul><li><strong>Unicast</strong> is one sender to one receiver. <strong>Broadcast</strong> is one sender to everyone. <strong>Multicast</strong> is one sender to a chosen group of receivers, and the sender sends each packet only once.</li><li>Receivers show interest by joining a group, identified by a class D address (224.0.0.0 to 239.255.255.255). Joining and leaving is handled by IGMP in real networks.</li><li><strong>Dense Mode (DM)</strong> assumes most routers have members. It floods the first packets to every branch and then prunes the branches that have no members (flood and prune, as in DVMRP). <strong>Sparse Mode</strong> (PIM-SM) works the other way: branches are added only when a receiver asks.</li></ul></div></details><details class="grp proc" open><summary>Procedure</summary><div class="gb"><ol><li>Create the simulator with <code>-multicast on</code> and open <code>output.tr</code> and <code>mcast.nam</code>.</li><li>Create eight nodes and seven 1.5 Mb links.</li><li>Select the multicast protocol: <code>set mrthandle [$ns mrtproto DM {}]</code>.</li><li>Allocate two groups with <code>Node allocaddr</code>.</li><li>Create two UDP agents with CBR traffic, one on n0 for group 1 and one on n1 for group 2, with <code>dst_addr_</code> set to the group.</li><li>Create six Null receiver agents on n5, n6 and n7, and schedule <code>join-group</code> and <code>leave-group</code> events.</li><li>Start both sources at 0.5 s, stop at 9.5 s, finish at 10.0 s.</li><li>Run <code>ns multicast.tcl</code> and watch the animation in nam.</li></ol></div></details><details class="grp " open><summary>Topology</summary><div class="gb"><div class="code"><div class="cbar"><span>text</span><button class="cp" type="button">Copy</button></div><pre><code>n0 ---\
+       n2 --- n3 --- n4 --- n5
+n1 ---/        |      \
+               n7      n6
+
+Sources: n0 sends to group 1, n1 sends to group 2.
+Receivers: n5, n6, n7.</code></pre></div></div></details><details class="grp " open><summary>Join and leave schedule</summary><div class="gb"><div class="tw"><table><tr><th>Time (s)</th><th>Event</th></tr><tr><td>1.0</td><td>n5 joins group 1</td></tr><tr><td>1.5</td><td>n6 joins group 1</td></tr><tr><td>2.0</td><td>n7 joins group 1</td></tr><tr><td>2.5</td><td>n5 joins group 2</td></tr><tr><td>3.0</td><td>n6 joins group 2</td></tr><tr><td>3.5</td><td>n7 joins group 2</td></tr><tr><td>4.0, 4.5, 5.0</td><td>n5, n6, n7 leave group 1</td></tr><tr><td>5.5, 6.0, 6.5</td><td>n5, n6, n7 leave group 2</td></tr></table></div><p><strong>Code: multicast.tcl</strong> (the repo version has a misplaced brace and an <code>&amp;amp;</code>, both fixed here)</p><div class="code"><div class="cbar"><span>tcl</span><button class="cp" type="button">Copy</button></div><pre><code>set ns [new Simulator -multicast on]
+
+set tf [open output.tr w]
+$ns trace-all $tf
+set fd [open mcast.nam w]
+$ns namtrace-all $fd
+
+set n0 [$ns node]
+set n1 [$ns node]
+set n2 [$ns node]
+set n3 [$ns node]
+set n4 [$ns node]
+set n5 [$ns node]
+set n6 [$ns node]
+set n7 [$ns node]
+
+$ns duplex-link $n0 $n2 1.5Mb 10ms DropTail
+$ns duplex-link $n1 $n2 1.5Mb 10ms DropTail
+$ns duplex-link $n2 $n3 1.5Mb 10ms DropTail
+$ns duplex-link $n3 $n4 1.5Mb 10ms DropTail
+$ns duplex-link $n3 $n7 1.5Mb 10ms DropTail
+$ns duplex-link $n4 $n5 1.5Mb 10ms DropTail
+$ns duplex-link $n4 $n6 1.5Mb 10ms DropTail
+
+set mproto DM
+set mrthandle [$ns mrtproto $mproto {}]
+
+set group1 [Node allocaddr]
+set group2 [Node allocaddr]
+
+set udp0 [new Agent/UDP]
+$ns attach-agent $n0 $udp0
+$udp0 set dst_addr_ $group1
+$udp0 set dst_port_ 0
+set cbr1 [new Application/Traffic/CBR]
+$cbr1 attach-agent $udp0
+
+set udp1 [new Agent/UDP]
+$ns attach-agent $n1 $udp1
+$udp1 set dst_addr_ $group2
+$udp1 set dst_port_ 0
+set cbr2 [new Application/Traffic/CBR]
+$cbr2 attach-agent $udp1
+
+set rcvr1 [new Agent/Null]
+$ns attach-agent $n5 $rcvr1
+$ns at 1.0 &quot;$n5 join-group $rcvr1 $group1&quot;
+
+set rcvr2 [new Agent/Null]
+$ns attach-agent $n6 $rcvr2
+$ns at 1.5 &quot;$n6 join-group $rcvr2 $group1&quot;
+
+set rcvr3 [new Agent/Null]
+$ns attach-agent $n7 $rcvr3
+$ns at 2.0 &quot;$n7 join-group $rcvr3 $group1&quot;
+
+set rcvr4 [new Agent/Null]
+$ns attach-agent $n5 $rcvr4
+$ns at 2.5 &quot;$n5 join-group $rcvr4 $group2&quot;
+
+set rcvr5 [new Agent/Null]
+$ns attach-agent $n6 $rcvr5
+$ns at 3.0 &quot;$n6 join-group $rcvr5 $group2&quot;
+
+set rcvr6 [new Agent/Null]
+$ns attach-agent $n7 $rcvr6
+$ns at 3.5 &quot;$n7 join-group $rcvr6 $group2&quot;
+
+$ns at 4.0 &quot;$n5 leave-group $rcvr1 $group1&quot;
+$ns at 4.5 &quot;$n6 leave-group $rcvr2 $group1&quot;
+$ns at 5.0 &quot;$n7 leave-group $rcvr3 $group1&quot;
+$ns at 5.5 &quot;$n5 leave-group $rcvr4 $group2&quot;
+$ns at 6.0 &quot;$n6 leave-group $rcvr5 $group2&quot;
+$ns at 6.5 &quot;$n7 leave-group $rcvr6 $group2&quot;
+
+$ns at 0.5 &quot;$cbr1 start&quot;
+$ns at 9.5 &quot;$cbr1 stop&quot;
+$ns at 0.5 &quot;$cbr2 start&quot;
+$ns at 9.5 &quot;$cbr2 stop&quot;
+
+proc finish {} {
+    global ns tf
+    $ns flush-trace
+    close $tf
+    exec nam mcast.nam &amp;
+    exit 0
+}
+
+$ns at 10.0 &quot;finish&quot;
+$ns set-animation-rate 3.0ms
+$ns run</code></pre></div><p><strong>Short version for the exam.</strong> <code>multicast_SHORT.tcl</code> uses five nodes with links 0-1, 1-2, 2-3 and 2-4. Sources are n0 (group 1) and n1 (group 2); receivers are n3 and n4, joining at 1.0, 1.5, 2.0 and 2.5 s and leaving at 4.0, 4.5, 5.0 and 5.5 s. Everything else is identical, so type this one if you are short of time.</p></div></details><details class="grp "><summary>Line-by-line explanation</summary><div class="gb"><ul><li><code>-multicast on</code> makes every node multicast capable. Without it, <code>mrtproto</code> fails.</li><li><code>mrtproto DM {}</code> starts the multicast routing protocol. The empty braces mean it runs on all nodes.</li><li><code>Node allocaddr</code> (capital N) gives the next free multicast address, so <code>group1</code> and <code>group2</code> are two different groups.</li><li>A sender does not name receivers. It only sets <code>dst_addr_</code> to the group address, and the routing protocol delivers the packet to whoever has joined.</li><li><code>join-group agent group</code> tells the node to deliver packets for that group to that agent. <code>leave-group</code> reverses it. The receiver agent must be attached to the node first.</li><li>Both sources stop at 9.5 s, and the simulation ends at 10.0 s.</li></ul></div></details><details class="grp out" open><summary>Expected output</summary><div class="gb"><p>There is no awk analysis for this program; the result is the nam animation and <code>output.tr</code>.</p><ul><li>Early in the run, with Dense Mode, packets are flooded through the network and then pruned from branches that have no members.</li><li>After n5 joins group 1 at 1.0 s, group 1 packets flow n0, n2, n3, n4, n5. After n7 joins at 2.0 s, a branch n3 to n7 is added.</li><li>As receivers leave between 4.0 and 6.5 s, branches are pruned and fewer links carry packets, until nothing is delivered.</li></ul></div></details><details class="grp viva"><summary>Viva questions</summary><div class="gb"><ul><li><strong>Unicast, broadcast, multicast?</strong> One to one, one to all, one to a group.</li><li><strong>Dense versus Sparse Mode?</strong> Dense floods and prunes, and suits groups with members everywhere. Sparse builds the tree only towards routers that ask, and suits groups spread thinly over a wide area.</li><li><strong>Why UDP for multicast?</strong> Multicast has no connection to one receiver, so there are no ACKs; UDP fits.</li><li><strong>What does </strong><strong><code>Node allocaddr</code></strong><strong> do?</strong> Allocates a unique multicast group address.</li><li><strong>How does a receiver join?</strong> <code>join-group</code> here; IGMP in real networks.</li><li><strong>Why did you run two groups?</strong> To show that a node can be in several groups and that traffic for one group does not reach members of another.</li></ul></div></details><details class="grp err"><summary>Common errors</summary><div class="gb"><ul><li><code>proc finish {}</code> with the opening brace on the next line: Tcl reports a syntax error.</li><li><code>&amp;amp;</code> in <code>exec nam mcast.nam &amp;amp;</code>: the HTML-escaped ampersand breaks the command. Use a plain <code>&amp;</code>.</li><li>Writing <code>mrtproto</code> before the links exist, or forgetting <code>-multicast on</code>.</li></ul></div></details></section><section class="sec" id="p9"><div class="sh"><span class="badge java">P9</span><h2>Program 9: DHCP client and server (Java)</h2><button class="done" type="button" data-id="p9">Mark revised</button></div><div class="quick"><div class="qa"><h3>How to run</h3><p class="fl">Files: DHCPServer.java, DHCPClient.java</p><div class="step"><span class="sl">Compile</span><div class="cmd"><code>javac DHCPServer.java DHCPClient.java</code><button class="cp" type="button">Copy</button></div></div><div class="step"><span class="sl">Terminal 1</span><div class="cmd"><code>java DHCPServer</code><button class="cp" type="button">Copy</button></div></div><div class="step"><span class="sl">Terminal 2</span><div class="cmd"><code>java DHCPClient</code><button class="cp" type="button">Copy</button></div></div><p class="nt">UDP is used. Start the server first. The client broadcasts a request and the server answers with an IP address.</p></div><div class="qb"><h3>What you will see</h3><div class="ot"><div class="ol">Terminal 1 (server)</div><pre>Allocated IP 192.168.1.2 to MAC 00:11:22:33:44:55</pre></div><div class="ot"><div class="ol">Terminal 2 (client)</div><pre>Received DHCP Response: Allocated IP: 192.168.1.2</pre></div></div></div><p><strong>Files:</strong> <code>DHCPServer.java</code>, <code>DHCPClient.java</code>. I compiled and ran both here: the server handed out 192.168.1.2 to the first client and 192.168.1.3 to the second.</p><p><strong>Unique lines to memorise:</strong> <code>new DatagramSocket(4900)</code> on the server, <code>socket.receive</code>, <code>availableIpAddresses.remove(0)</code>, and <code>socket.send</code> back to the client&#x27;s address and port.</p><details class="grp " open><summary>Aim</summary><div class="gb"><p>To implement a simple DHCP server and client in Java using UDP sockets, where the server assigns an IP address from its address pool to every client that requests one.</p></div></details><details class="grp "><summary>Theory</summary><div class="gb"><ul><li>DHCP (Dynamic Host Configuration Protocol) gives a host its IP address, subnet mask, gateway and DNS automatically, so nobody configures each machine by hand.</li><li>The real protocol has four steps, remembered as <strong>DORA</strong>: the client broadcasts <strong>D</strong>iscover, the server replies with an <strong>O</strong>ffer, the client sends a <strong>R</strong>equest for that offer, and the server sends an <strong>A</strong>cknowledge. The address is leased for a limited time.</li><li>Real DHCP runs over UDP, server port 67 and client port 68. UDP is used because the client has no IP address yet and so cannot hold a TCP connection.</li><li>This program is a simplified version: one request message and one reply message, on port 4900 so it needs no administrator rights.</li></ul></div></details><details class="grp proc" open><summary>Procedure</summary><div class="gb"><ol><li>Write <code>DHCPServer.java</code>: fill a list with 192.168.1.2 to 192.168.1.254, open a <code>DatagramSocket</code> on port 4900, and loop forever receiving requests.</li><li>For each request, remove the first address from the list and send &quot;Allocated IP: ...&quot; back to the sender&#x27;s address and port.</li><li>Write <code>DHCPClient.java</code>: send &quot;DHCP Request with MAC: 00:11:22:33:44:55&quot; to the server, wait for the reply, and print it.</li><li>Compile: <code>javac DHCPServer.java DHCPClient.java</code>.</li><li>Terminal 1: <code>java DHCPServer</code>. Terminal 2: <code>java DHCPClient</code>. Run the client again to see the next address.</li></ol></div></details><details class="grp codel" open><summary>Code: DHCPServer.java</summary><div class="gb"><div class="code"><div class="cbar"><span>java</span><button class="cp" type="button">Copy</button></div><pre><code>import java.net.*;
+import java.util.*;
+
+public class DHCPServer {
+    private static List&lt;String&gt; availableIpAddresses = new ArrayList&lt;&gt;();
+
+    public static void main(String[] args) {
+
+        for (int i = 2; i &lt;= 254; i++)
+            availableIpAddresses.add(&quot;192.168.1.&quot; + i);
+
+        try {
+            DatagramSocket socket = new DatagramSocket(4900);
+            while (true) {
+                // Receive
+                byte[] receiveData = new byte[1024];
+                DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
+                socket.receive(receivePacket);
+
+                // Extract
+                InetAddress clientAddress = receivePacket.getAddress();
+                String allocatedIp = availableIpAddresses.remove(0);
+
+                // Response
+                byte[] responseData = (&quot;Allocated IP: &quot; + allocatedIp).getBytes();
+                DatagramPacket responsePacket = new DatagramPacket(responseData, responseData.length,
+                        clientAddress, receivePacket.getPort());
+                socket.send(responsePacket);
+
+                // Display
+                System.out.println(&quot;Allocated IP &quot; + allocatedIp + &quot; to MAC &quot; + &quot;00:11:22:33:44:55&quot;);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}</code></pre></div></div></details><details class="grp codel" open><summary>Code: DHCPClient.java</summary><div class="gb"><div class="code"><div class="cbar"><span>java</span><button class="cp" type="button">Copy</button></div><pre><code>import java.net.*;
+
+public class DHCPClient {
+    public static void main(String[] args) {
+        try (DatagramSocket socket = new DatagramSocket()) {
+            // Request to server
+            InetAddress serverAddress = InetAddress.getByName(&quot;127.0.0.1&quot;);
+            byte[] requestData = (&quot;DHCP Request with MAC: 00:11:22:33:44:55&quot;).getBytes();
+            DatagramPacket requestPacket = new DatagramPacket(requestData, requestData.length, serverAddress, 4900);
+            socket.send(requestPacket);
+
+            // Receive
+            byte[] receiveData = new byte[1024];
+            DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
+            socket.receive(receivePacket);
+
+            // Display
+            String response = new String(receivePacket.getData()).trim();
+            System.out.println(&quot;Received DHCP Response: &quot; + response);
+
+            socket.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}</code></pre></div></div></details><details class="grp "><summary>Line-by-line explanation</summary><div class="gb"><ul><li><code>List&lt;String&gt; availableIpAddresses</code> is the address pool. The loop from 2 to 254 skips .0 (network), .1 (usually the gateway) and .255 (broadcast).</li><li><code>new DatagramSocket(4900)</code> makes the server listen on UDP port 4900. The client uses <code>new DatagramSocket()</code>, which picks any free port.</li><li><code>socket.receive(receivePacket)</code> blocks until a datagram arrives. After it returns, <code>getAddress()</code> and <code>getPort()</code> tell the server who sent it.</li><li><code>remove(0)</code> takes the first free address out of the pool, so no address is given twice.</li><li>The reply goes to <code>clientAddress</code> and <code>receivePacket.getPort()</code>, which is how a connectionless UDP server answers.</li><li>The client calls <code>send</code> then <code>receive</code>. <code>trim()</code> removes the unused zero bytes left in the 1024 byte buffer.</li><li><code>127.0.0.1</code> means the client and server run on the same machine. To use two machines, put the server&#x27;s IP address there.</li></ul></div></details><details class="grp out" open><summary>Expected output</summary><div class="gb"><p>Server terminal, one line per client:</p><div class="code"><div class="cbar"><span>text</span><button class="cp" type="button">Copy</button></div><pre><code>Allocated IP 192.168.1.2 to MAC 00:11:22:33:44:55
+Allocated IP 192.168.1.3 to MAC 00:11:22:33:44:55</code></pre></div><p>Client terminal, each run:</p><div class="code"><div class="cbar"><span>text</span><button class="cp" type="button">Copy</button></div><pre><code>Received DHCP Response: Allocated IP: 192.168.1.2</code></pre></div><p>The server prints a fixed MAC string; it does not read the MAC out of the request. The client&#x27;s own request text is what carries it.</p></div></details><details class="grp viva"><summary>Viva questions</summary><div class="gb"><ul><li><strong>What does DHCP do?</strong> Gives hosts an IP address and network settings automatically.</li><li><strong>Four DHCP messages?</strong> Discover, Offer, Request, Acknowledge (DORA). This program implements only one request and one reply.</li><li><strong>Why UDP?</strong> The client has no IP address yet, and UDP needs no connection. Real DHCP uses ports 67 (server) and 68 (client).</li><li><strong>Why does the server use a fixed port but the client does not?</strong> The client must know where to send; the server can reply to whatever port the request came from.</li><li><strong>What is a lease?</strong> The time the client may keep the address. This program does not implement leases or release.</li><li><strong>What happens when the pool is empty?</strong> <code>remove(0)</code> throws an <code>IndexOutOfBoundsException</code>, caught and printed by the <code>catch</code> block.</li></ul></div></details><details class="grp err"><summary>Common errors</summary><div class="gb"><ul><li>Starting the client before the server: <code>receive</code> blocks forever because nobody answers.</li><li><code>java.net.BindException: Address already in use</code>: an old server is still running on port 4900.</li><li>Compiling only one file, or running from a different folder, gives &quot;Could not find or load main class&quot;.</li><li>Class name must match the file name: <code>DHCPServer</code> in <code>DHCPServer.java</code>.</li></ul></div></details></section><section class="sec" id="p10"><div class="sh"><span class="badge ns2">P10</span><h2>Program 10: Ethernet LAN (IEEE 802.3)</h2><button class="done" type="button" data-id="p10">Mark revised</button></div><div class="quick"><div class="qa"><h3>How to run</h3><p class="fl">Files: ethernet_lan.tcl, analysis.awk</p><div class="step"><span class="sl">Run simulation</span><div class="cmd"><code>ns ethernet_lan.tcl</code><button class="cp" type="button">Copy</button></div></div><div class="step"><span class="sl">Analyse trace</span><div class="cmd"><code>gawk -f analysis.awk LAN.tr</code><button class="cp" type="button">Copy</button></div></div><p class="nt">The script calls gawk by itself at the end. If it fails, run the second command by hand.</p></div><div class="qb"><h3>What you will see</h3><div class="ot"><div class="ol">awk result</div><pre>Final Values..
+filesize : 184800
+latency  : 9.82908
+Throughput (bytes/sec) : 18801.3
+Throughput (Mbps)      : 0.150411</pre></div></div></div><p><strong>Files:</strong> <code>ethernet_lan.tcl</code>, <code>analysis.awk</code>. Short versions: <code>ethernet_lan_SHORT.tcl</code>, <code>analysis_SHORT.awk</code>.</p><p><strong>Unique lines to memorise:</strong> <code>$ns make-lan &quot;$n1 $n2 $n3 $n4 $n5 $n6&quot; 0.2Mb 20ms LL Queue/DropTail Mac/802_3</code>. Everything else is the skeleton with two TCP and FTP flows.</p><details class="grp " open><summary>Aim</summary><div class="gb"><p>To simulate a wired Ethernet LAN (IEEE 802.3, CSMA/CD) with six nodes sharing one medium, run two FTP transfers over it, and calculate throughput from the trace file.</p></div></details><details class="grp "><summary>Theory</summary><div class="gb"><ul><li>Classic Ethernet is a shared bus: every node sees every frame, and only one node can transmit at a time. All the nodes form one collision domain.</li><li><strong>CSMA/CD</strong> is the access method. <strong>Carrier Sense</strong>: listen before sending. <strong>Multiple Access</strong>: many nodes share the wire. <strong>Collision Detection</strong>: if two nodes send together, they detect the collision, send a jam signal, stop, wait a random time, and try again.</li><li>The wait uses <strong>binary exponential backoff</strong>: after the n-th collision the node waits a random number of slot times between 0 and 2^n - 1, so repeated collisions spread the retries further apart.</li><li>In NS2, <code>make-lan</code> joins a list of nodes with a shared link and adds one extra virtual node to represent the LAN itself.</li></ul></div></details><details class="grp proc" open><summary>Procedure</summary><div class="gb"><ol><li>Create the simulator and open <code>LAN.tr</code> and <code>LAN.nam</code>.</li><li>Create six nodes n1 to n6.</li><li>Join them with <code>make-lan</code>: 0.2 Mb shared bandwidth, 20 ms delay, link layer <code>LL</code>, queue <code>Queue/DropTail</code>, MAC <code>Mac/802_3</code>.</li><li>Create two TCP senders on n1 and n2, and two TCPSinks on n5 and n6. Connect each sender to its sink.</li><li>Attach an FTP application to each sender. Start the first at 0.1 s and the second at 0.4 s.</li><li>Run to 10 s. <code>finish</code> flushes the trace, closes the files, and starts the awk script.</li><li>Run <code>ns ethernet_lan.tcl</code>, then <code>gawk -f analysis.awk LAN.tr</code>.</li></ol></div></details><details class="grp " open><summary>Topology</summary><div class="gb"><div class="code"><div class="cbar"><span>text</span><button class="cp" type="button">Copy</button></div><pre><code>n1 ---+                         +--- n5
+n2 ---+                         |
+n3 ---+------- shared LAN ------+--- n6
+n4 ---+      0.2Mb, 20ms
+
+FTP flow 1: n1 -&gt; n5, starts at 0.1 s
+FTP flow 2: n2 -&gt; n6, starts at 0.4 s</code></pre></div><p><strong>Code: ethernet_lan.tcl</strong> (the repo version calls <code>anal.awk</code>, which does not exist; fixed to <code>analysis.awk</code>)</p><div class="code"><div class="cbar"><span>tcl</span><button class="cp" type="button">Copy</button></div><pre><code>set ns [new Simulator]
+
+set tr [open &quot;LAN.tr&quot; w]
+$ns trace-all $tr
+set nam [open &quot;LAN.nam&quot; w]
+$ns namtrace-all $nam
+
+set n1 [$ns node]
+set n2 [$ns node]
+set n3 [$ns node]
+set n4 [$ns node]
+set n5 [$ns node]
+set n6 [$ns node]
+
+$ns make-lan &quot;$n1 $n2 $n3 $n4 $n5 $n6&quot; 0.2Mb 20ms LL Queue/DropTail Mac/802_3
+
+set tcpsendagent1 [new Agent/TCP]
+set tcpsendagent2 [new Agent/TCP]
+set tcprecvagent1 [new Agent/TCPSink]
+set tcprecvagent2 [new Agent/TCPSink]
+
+$ns attach-agent $n1 $tcpsendagent1
+$ns attach-agent $n2 $tcpsendagent2
+$ns attach-agent $n5 $tcprecvagent1
+$ns attach-agent $n6 $tcprecvagent2
+
+set app1 [new Application/FTP]
+set app2 [new Application/FTP]
+$app1 attach-agent $tcpsendagent1
+$app2 attach-agent $tcpsendagent2
+
+$ns connect $tcpsendagent1 $tcprecvagent1
+$ns connect $tcpsendagent2 $tcprecvagent2
+
+$ns at 0.1 &quot;$app1 start&quot;
+$ns at 0.4 &quot;$app2 start&quot;
+
+proc finish { } {
+    global ns tr nam
+    $ns flush-trace
+    close $tr
+    close $nam
+    exec gawk -f analysis.awk LAN.tr &amp;
+    exit 0
+}
+
+$ns at 10 &quot;finish&quot;
+$ns run</code></pre></div></div></details><details class="grp codel" open><summary>Code: analysis.awk</summary><div class="gb"><div class="code"><div class="cbar"><span>awk</span><button class="cp" type="button">Copy</button></div><pre><code>BEGIN { filesize1 = 0; starttime1 = 0; endtime1 = 0; flag1 = 0 }
+{
+    if ($1 == &quot;r&quot; &amp;&amp; $3 == 6) {
+        if (flag1 == 0) {
+            flag1 = 1
+            starttime1 = $2
+        }
+        filesize1 += $6
+        endtime1 = $2
+    }
+}
+END {
+    latency1 = endtime1 - starttime1
+    print(&quot;Final Values..&quot;)
+    print(&quot;filesize :&quot;, filesize1)
+    print(&quot;latency  :&quot;, latency1)
+    print(&quot;Throughput (bytes/sec) :&quot;, filesize1 / latency1)
+    print(&quot;Throughput (Mbps)      :&quot;, filesize1 * 8 / latency1 / 1e6)
+}</code></pre></div><p>The repo version prints <code>filesize / latency / 1e6</code> and labels it Mbps. That number is megabytes per second. I added the second line, which multiplies by 8, so you can quote either. The shared LAN is only 0.2 Mbps, so a correct Mbps figure must come out below 0.2.</p><p>The repo version also appends a point to <code>file3.xg</code> for plotting. That is optional and left out here.</p><p><strong>Short version for the exam.</strong> <code>ethernet_lan_SHORT.tcl</code> is identical except that both receivers are on n6 (<code>$ns attach-agent $n6 $tcprecvagent1</code> and <code>$ns attach-agent $n6 $tcprecvagent2</code>), and it runs <code>analysis_SHORT.awk</code>. Use whichever your lab sheet shows.</p></div></details><details class="grp "><summary>Line-by-line explanation</summary><div class="gb"><ul><li><code>make-lan</code> takes the node list in quotes, then bandwidth, delay, link layer, queue type and MAC type. <code>Mac/802_3</code> is what makes it Ethernet with CSMA/CD.</li><li>The six nodes share the 0.2 Mb capacity, so the two TCP flows compete for it and the sum of their throughputs cannot exceed it.</li><li>NS2 numbers nodes from 0 in creation order, so n1 to n6 are ids 0 to 5. The LAN&#x27;s virtual node is created next and gets id 6.</li><li>That is why the awk filter is <code>$3 == 6</code>: it matches packets arriving from the LAN node, which means every packet the LAN delivers. This includes the TCP ACKs travelling back to the senders, not just data.</li><li><code>connect</code> must come after both agents are attached. The two connections give two independent TCP flows.</li><li>The second flow starts at 0.4 s, so from then on the two flows contend for the medium.</li></ul></div></details><details class="grp out" open><summary>Expected output</summary><div class="gb"><ul><li>nam: six nodes around a LAN, with packets sent in both directions; some queue build-up once the second flow starts.</li><li>awk: total bytes delivered, the time between the first and last delivery (a little under 10 s), and a throughput that stays below the 0.2 Mbps link capacity.</li><li>The exact values depend on collisions and back-off, so compare against your lab&#x27;s reference run.</li></ul></div></details><details class="grp viva"><summary>Viva questions</summary><div class="gb"><ul><li><strong>What is CSMA/CD?</strong> Listen before sending; if two nodes collide, both stop, wait a random time and retry.</li><li><strong>What is binary exponential backoff?</strong> After the n-th collision wait a random 0 to 2^n - 1 slot times, so retries spread out.</li><li><strong>Why must a frame have a minimum size?</strong> The sender must still be transmitting when a collision signal returns, so the collision is detected; 64 bytes in 10 Mbps Ethernet.</li><li><strong>Collision domain?</strong> The set of devices whose frames can collide; one shared LAN here.</li><li><strong>Why do two TCP flows each get less than the total?</strong> They share the one 0.2 Mb medium.</li><li><strong>What does </strong><strong><code>Mac/802_3</code></strong><strong> do?</strong> Selects the IEEE 802.3 Ethernet MAC protocol in NS2.</li></ul></div></details><details class="grp err"><summary>Common errors</summary><div class="gb"><ul><li><code>anal.awk</code> in <code>finish</code> when the file is called <code>analysis.awk</code>: awk reports that it cannot open the file.</li><li><code>gawk</code> not installed: use <code>awk -f analysis.awk LAN.tr</code> instead, or install gawk.</li><li>If the awk output does not appear in the terminal after <code>ns</code> ends, run the awk command by hand.</li><li>Typing <code>Mac/802.3</code> with a dot instead of <code>Mac/802_3</code>.</li></ul></div></details></section><section class="sec" id="p11"><div class="sh"><span class="badge ns2">P11</span><h2>Program 11: Wireless LAN (IEEE 802.11, AODV)</h2><button class="done" type="button" data-id="p11">Mark revised</button></div><div class="quick"><div class="qa"><h3>How to run</h3><p class="fl">Files: wireless_lan_SHORT.tcl, analysis awk</p><div class="step"><span class="sl">Run simulation</span><div class="cmd"><code>ns wireless_lan_SHORT.tcl</code><button class="cp" type="button">Copy</button></div></div><div class="step"><span class="sl">Analyse trace</span><div class="cmd"><code>awk -f analysis.awk trace.tr</code><button class="cp" type="button">Copy</button></div></div><div class="step"><span class="sl">Animation</span><div class="cmd"><code>nam complexdcf.nam</code><button class="cp" type="button">Copy</button></div></div><p class="nt">Opens nam at the end. The packet counts are large because the trace includes every packet event.</p></div><div class="qb"><h3>What you will see</h3><div class="ot"><div class="ol">awk result</div><pre>Packets sent     : 107335
+Packets received : 53583
+Delivery ratio   : 49.9213 %
+Throughput (kbps): 526.801</pre></div></div></div><p><strong>Files:</strong> <code>wireless_lan_SHORT.tcl</code> (5 nodes, use this one) and <code>wireless_lan.tcl</code> (15 nodes, long).</p><p><strong>Unique lines to memorise:</strong> the <code>val(...)</code> parameter block, <code>namtrace-all-wireless</code>, <code>Topography</code> with <code>load_flatgrid</code>, <code>create-god</code>, the <code>node-config</code> block, <code>setdest</code>, and <code>Agent/LossMonitor</code> as the sink.</p><details class="grp " open><summary>Aim</summary><div class="gb"><p>To simulate an IEEE 802.11 wireless LAN of mobile nodes using AODV routing, send CBR traffic between nodes, and measure the traffic delivered.</p></div></details><details class="grp "><summary>Theory</summary><div class="gb"><ul><li><strong>IEEE 802.11</strong> is Wi-Fi. Wireless nodes cannot detect collisions while sending, so it uses <strong>CSMA/CA</strong> (collision avoidance) in its <strong>DCF</strong> mode: listen, wait a random backoff, send, and wait for an ACK. Optional RTS/CTS handshakes reduce the hidden terminal problem, where two nodes cannot hear each other but both reach a third.</li><li><strong>AODV</strong> (Ad hoc On-demand Distance Vector) finds routes only when needed. A source broadcasts a route request (RREQ); the destination, or a node that knows a route, answers with a route reply (RREP) along the reverse path. Route errors (RERR) report broken links.</li><li>Radio range is limited (about 250 m by default in NS2), so distant nodes talk through intermediate nodes. That multi-hop behaviour is what AODV handles.</li><li><strong>TwoRayGround</strong> is the radio propagation model: signal strength falls with distance, using the direct and ground-reflected rays.</li></ul></div></details><details class="grp proc" open><summary>Procedure</summary><div class="gb"><ol><li>Set the parameters in a <code>val</code> array: channel, propagation, antenna, link layer, queue, MAC, node count and routing protocol.</li><li>Create the simulator, <code>trace.tr</code>, and the nam file with <code>namtrace-all-wireless</code> for an 800 x 800 area.</li><li>Create the topography with <code>load_flatgrid 800 800</code> and the GOD object with <code>create-god</code>.</li><li>Configure the nodes with <code>node-config</code>, then create five nodes with <code>random-motion 0</code>.</li><li>Place the nodes with <code>setdest</code> (x, y, speed).</li><li>Create two LossMonitor sinks on n1 and n3, and two CBR sources on n0 and n2 pointed at them.</li><li>Start the sources at 20 s, stop them at 800 s and 850 s, finish at 900 s.</li><li>Run <code>ns wireless_lan_SHORT.tcl</code>.</li></ol><p><strong>Topology</strong> (positions after <code>setdest</code>, in metres)</p><div class="code"><div class="cbar"><span>text</span><button class="cp" type="button">Copy</button></div><pre><code>n0 (100,100)   n1 (200,200)   n2 (300,200)   n3 (400,300)   n4 (500,300)
+
+cbr0: n0 -&gt; n3   needs several hops, e.g. n0, n1, n2, n3
+cbr1: n2 -&gt; n1   one hop</code></pre></div><p>The nodes start at (0,0) and are sent to these positions at time 0 at 3000 m/s, so they arrive almost instantly. n0 to n3 is about 360 m, more than the radio range, so that flow needs AODV to find a multi-hop route.</p></div></details><details class="grp codel" open><summary>Code: wireless_lan_SHORT.tcl</summary><div class="gb"><div class="code"><div class="cbar"><span>tcl</span><button class="cp" type="button">Copy</button></div><pre><code>set val(chan) Channel/WirelessChannel
+set val(netif) Phy/WirelessPhy
+set val(prop) Propagation/TwoRayGround
+set val(ant) Antenna/OmniAntenna
+set val(ll) LL
+set val(ifq) Queue/DropTail/PriQueue
+set val(ifqlen) 50
+set val(mac) Mac/802_11
+set val(nn) 5
+set val(rp) AODV
+
+set ns [new Simulator]
+set f [open trace.tr w]
+$ns trace-all $f
+set namtrace [open complexdcf.nam w]
+$ns namtrace-all-wireless $namtrace 800 800
+
+set topo [new Topography]
+$topo load_flatgrid 800 800
+
+create-god $val(nn)
+set chan_1 [new Channel/WirelessChannel]
+
+$ns node-config -adhocRouting $val(rp) \
+                -macType $val(mac) \
+                -channel $chan_1 \
+                -propType $val(prop) \
+                -phyType $val(netif) \
+                -antType $val(ant) \
+                -llType $val(ll) \
+                -ifqType $val(ifq) \
+                -ifqLen $val(ifqlen) \
+                -agentTrace ON \
+                -topoInstance $topo
+
+set n(0) [$ns node]
+$n(0) random-motion 0
+set n(1) [$ns node]
+$n(1) random-motion 0
+set n(2) [$ns node]
+$n(2) random-motion 0
+set n(3) [$ns node]
+$n(3) random-motion 0
+set n(4) [$ns node]
+$n(4) random-motion 0
+
+$n(0) set X_ 0.0
+$n(0) set Y_ 0.0
+$n(0) set Z_ 0.0
+$n(1) set X_ 0.0
+$n(1) set Y_ 0.0
+$n(1) set Z_ 0.0
+$n(2) set X_ 0.0
+$n(2) set Y_ 0.0
+$n(2) set Z_ 0.0
+$n(3) set X_ 0.0
+$n(3) set Y_ 0.0
+$n(3) set Z_ 0.0
+$n(4) set X_ 0.0
+$n(4) set Y_ 0.0
+$n(4) set Z_ 0.0
+
+$ns at 0.0 &quot;$n(0) setdest 100.0 100.0 3000.0&quot;
+$ns at 0.0 &quot;$n(1) setdest 200.0 200.0 3000.0&quot;
+$ns at 0.0 &quot;$n(2) setdest 300.0 200.0 3000.0&quot;
+$ns at 0.0 &quot;$n(3) setdest 400.0 300.0 3000.0&quot;
+$ns at 0.0 &quot;$n(4) setdest 500.0 300.0 3000.0&quot;
+
+set sink(1) [new Agent/LossMonitor]
+$ns attach-agent $n(1) $sink(1)
+set sink(3) [new Agent/LossMonitor]
+$ns attach-agent $n(3) $sink(3)
+
+set cbr0 [new Agent/CBR]
+$ns attach-agent $n(0) $cbr0
+$cbr0 set packetSize_ 1000
+$cbr0 set interval_ 0.015
+$ns connect $cbr0 $sink(3)
+
+set cbr1 [new Agent/CBR]
+$ns attach-agent $n(2) $cbr1
+$cbr1 set packetSize_ 1000
+$cbr1 set interval_ 0.015
+$ns connect $cbr1 $sink(1)
+
+$ns at 20.0 &quot;$cbr0 start&quot;
+$ns at 20.0 &quot;$cbr1 start&quot;
+$ns at 800.0 &quot;$cbr0 stop&quot;
+$ns at 850.0 &quot;$cbr1 stop&quot;
+
+proc finish {} {
+    global ns f namtrace
+    $ns flush-trace
+    close $f
+    exec nam -r 5m complexdcf.nam &amp;
+    exit 0
+}
+
+$ns at 900.0 &quot;finish&quot;
+$ns run</code></pre></div><p>Changes from the repo file, all small: the trailing backslash after <code>-topoInstance $topo</code> is removed, <code>lassign</code> is replaced by <code>lindex</code> (older Tcl does not have it), the three TCP agents that were created but never used are dropped, and <code>-agentTrace ON</code> is added so the trace contains application-layer events that awk can read. The repo file has no analysis script for this program.</p><p><strong>Optional analysis for the trace</strong> (my addition; use it only if the exam asks for delivery ratio or throughput)</p><div class="code"><div class="cbar"><span>awk</span><button class="cp" type="button">Copy</button></div><pre><code>BEGIN { sent = 0; recvd = 0; bytes = 0; first = 0; last = 0; flag = 0 }
+{
+    if ($4 == &quot;AGT&quot; &amp;&amp; $7 == &quot;cbr&quot;) {
+        if ($1 == &quot;s&quot;) sent++
+        if ($1 == &quot;r&quot;) {
+            recvd++
+            bytes += $8
+            if (flag == 0) { first = $2; flag = 1 }
+            last = $2
+        }
+    }
+}
+END {
+    print &quot;Packets sent     :&quot;, sent
+    print &quot;Packets received :&quot;, recvd
+    print &quot;Delivery ratio   :&quot;, recvd / sent * 100, &quot;%&quot;
+    print &quot;Throughput (kbps):&quot;, bytes * 8 / (last - first) / 1000
+}</code></pre></div><p>Run it with <code>awk -f wireless_analysis.awk trace.tr</code>. It uses the standard wireless trace layout (event, time, node, layer, flags, packet id, type, size), which is the layout the Program 5 awk script in the repo also relies on. I have not run it in NS2.</p></div></details><details class="grp "><summary>Line-by-line explanation</summary><div class="gb"><ul><li>The <code>val</code> array is only a set of named settings; <code>node-config</code> uses them. Every wireless script needs the same block.</li><li><code>namtrace-all-wireless file 800 800</code> tells nam the size of the area. <code>Topography</code> with <code>load_flatgrid 800 800</code> gives the nodes a flat 800 x 800 m field to be placed in.</li><li><code>create-god</code> makes the General Operations Director, a global object that holds node and connectivity information for the simulator. It takes the number of nodes.</li><li><code>node-config</code> is set before the nodes are created and applies to every node created after it: routing protocol, MAC, queue, antenna, propagation, channel.</li><li><code>random-motion 0</code> stops random movement; the nodes only move when <code>setdest</code> tells them to.</li><li><code>setdest x y speed</code> moves a node. At 3000 m/s the move is effectively instant, so this just places the nodes.</li><li><code>Agent/LossMonitor</code> is a receiver that counts packets, bytes and losses. Its <code>bytes_</code> variable is what the long version samples to get throughput.</li><li>The CBR source sends a 1000 byte packet every 0.015 s, about 533 kbps, for 780 seconds.</li><li>The 20 s start leaves time for the nodes to settle before AODV discovers the route.</li></ul><p><strong>If </strong><strong><code>Agent/CBR</code></strong><strong> is rejected.</strong> The repo script uses the older <code>Agent/CBR</code> class. If your NS2 version reports an error on it, replace each CBR block with the pattern used in the earlier programs:</p><div class="code"><div class="cbar"><span>tcl</span><button class="cp" type="button">Copy</button></div><pre><code>set udp0 [new Agent/UDP]
+$ns attach-agent $n(0) $udp0
+$ns connect $udp0 $sink(3)
+set cbr0 [new Application/Traffic/CBR]
+$cbr0 attach-agent $udp0
+$cbr0 set packetSize_ 1000
+$cbr0 set interval_ 0.015</code></pre></div></div></details><details class="grp out" open><summary>Expected output</summary><div class="gb"><ul><li>nam: five nodes drawn in the 800 x 800 area; from 20 s packets move from n0 across intermediate nodes to n3, and from n2 to n1.</li><li><code>trace.tr</code>: a very large file. It contains send, receive and drop events with the layer name (AGT, RTR, MAC) and, for AODV, route request and reply packets just after 20 s.</li><li>The first packets of the n0 to n3 flow are delayed or lost while AODV discovers the route; after that, delivery is steady until the sources stop.</li></ul></div></details><details class="grp viva"><summary>Viva questions</summary><div class="gb"><ul><li><strong>CSMA/CD versus CSMA/CA?</strong> CD detects a collision while sending and works on wired links. CA avoids collisions with random backoff and ACKs because a wireless node cannot hear while it transmits.</li><li><strong>What is the hidden terminal problem?</strong> Two nodes out of each other&#x27;s range both send to a node in the middle and collide there. RTS/CTS reduces it.</li><li><strong>How does AODV work?</strong> On demand: broadcast RREQ, RREP returns along the reverse path, RERR on link break.</li><li><strong>Proactive versus reactive routing?</strong> Proactive (DSDV) keeps routes to everyone all the time; reactive (AODV, DSR) finds routes when needed.</li><li><strong>What is GOD?</strong> A global simulator object that holds node and connectivity information.</li><li><strong>Why does the n0 to n3 flow need multiple hops?</strong> The distance is about 360 m, beyond the default radio range of about 250 m.</li><li><strong>Why LossMonitor and not Null?</strong> It counts received packets and bytes, so throughput and loss can be read from it.</li></ul></div></details><details class="grp err"><summary>Common errors</summary><div class="gb"><ul><li>Calling <code>$ns node</code> before <code>node-config</code>: those nodes do not get the wireless settings.</li><li>Forgetting <code>create-god</code>, or giving it a different node count than <code>val(nn)</code>.</li><li>Using coordinates larger than the 800 x 800 area.</li><li>A backslash at the end of the last <code>node-config</code> line, which glues the next line onto it.</li><li>Stopping the run early: the script simulates 900 s of network time, which can take a while on a slow machine, so wait for nam to open.</li></ul></div></details></section>
+<section class="sec" id="ref"><div class="sh"><span class="badge fnd">Cheat sheet</span><h2>Quick reference and exam-day checklist</h2></div><details class="grp " open><summary>All run commands</summary><div class="gb"><div class="tw"><table><tr><th>Program</th><th>Files</th><th>Commands</th></tr><tr><td>6A Flow control</td><td><code>flow_control.tcl</code>, <code>flow_control_analysis.awk</code></td><td><code>ns flow_control.tcl</code> then <code>awk -f flow_control_analysis.awk trace1.tr</code></td></tr><tr><td>6B Congestion control</td><td><code>congestion_control.tcl</code>, <code>congestion_control_analysis.awk</code></td><td><code>ns congestion_control.tcl</code> then <code>awk -f congestion_control_analysis.awk TCPcc.tr</code></td></tr><tr><td>7 DV</td><td><code>DV.tcl</code>, <code>analysis.awk</code></td><td><code>ns DV.tcl</code> then <code>awk -f analysis.awk out_dv.tr</code></td></tr><tr><td>7 LS</td><td><code>LS.tcl</code>, <code>analysis.awk</code></td><td><code>ns LS.tcl</code> then <code>awk -f analysis.awk out_ls.tr</code></td></tr><tr><td>8 Multicast</td><td><code>multicast.tcl</code></td><td><code>ns multicast.tcl</code> (nam opens)</td></tr><tr><td>9 DHCP</td><td><code>DHCPServer.java</code>, <code>DHCPClient.java</code></td><td><code>javac DHCPServer.java DHCPClient.java</code>, then <code>java DHCPServer</code> in one terminal and <code>java DHCPClient</code> in another</td></tr><tr><td>10 Ethernet LAN</td><td><code>ethernet_lan.tcl</code>, <code>analysis.awk</code></td><td><code>ns ethernet_lan.tcl</code> then <code>gawk -f analysis.awk LAN.tr</code></td></tr><tr><td>11 Wireless LAN</td><td><code>wireless_lan_SHORT.tcl</code></td><td><code>ns wireless_lan_SHORT.tcl</code> (nam opens)</td></tr></table></div><p>Opening a trace for animation: <code>nam &lt;file&gt;.nam</code>. Plotting a data file: <code>xgraph &lt;file&gt;</code>.</p></div></details><details class="grp " open><summary>Errors and fixes</summary><div class="gb"><div class="tw"><table><tr><th>Error or symptom</th><th>Cause</th><th>Fix</th></tr><tr><td><code>wrong # args</code> or syntax error near a <code>proc</code></td><td>Opening brace on the next line</td><td>Write <code>proc finish {} {</code> on one line</td></tr><tr><td><code>can&#x27;t read &quot;ns&quot;: no such variable</code> inside a proc</td><td>Missing <code>global</code></td><td>Add <code>global ns ...</code> or <code>set ns [Simulator instance]</code></td></tr><tr><td>awk prints zeros or divides by zero</td><td>Wrong node number in the filter</td><td>Use the receiving node: 6A <code>$4==2</code>, 6B <code>$4==5</code>, 7 <code>$4==3</code>, 10 <code>$3==6</code></td></tr><tr><td><code>xgraph: command not found</code></td><td>xgraph not installed</td><td>Files are still written; open them another way or install xgraph</td></tr><tr><td>nam does not open</td><td>No display or nam not installed</td><td>Check the <code>.nam</code> file exists; run <code>nam file.nam</code> manually</td></tr><tr><td>Throughput file is empty</td><td>Files not closed in <code>finish</code></td><td>Close every opened file before <code>exec</code></td></tr><tr><td><code>&amp;amp;</code> after <code>exec nam ...</code></td><td>HTML-escaped ampersand pasted from a web page</td><td>Replace with a plain <code>&amp;</code></td></tr><tr><td>Java: <code>BindException</code></td><td>Old server still on port 4900</td><td>Stop it and start again</td></tr><tr><td>Java client hangs</td><td>Server not running</td><td>Start the server first</td></tr><tr><td>Wireless script: nodes ignore settings</td><td><code>$ns node</code> called before <code>node-config</code></td><td>Put <code>node-config</code> before creating nodes</td></tr></table></div></div></details><details class="grp viva"><summary>Viva answer template</summary><div class="gb"><p>For any program, answer in four short parts: the aim in one sentence, what the topology and traffic were, what the output showed, and why it looked that way. Examples of the last part: the throughput dips because the link was down (Program 7), the curves do not overlap because the variants run in separate time slots (6B), group traffic follows join and leave events because Dense Mode prunes empty branches (Program 8).</p></div></details><details class="grp " open><summary>Last-hour revision checklist</summary><div class="gb"><ul><li>Write the nine-step skeleton from memory.</li><li>Write the awk template and name the node used in each program.</li><li>For each program, say its unique lines out loud (listed at the top of each section).</li><li>Say the aim of each program in one sentence.</li><li>DHCP: write the server loop (<code>receive</code>, <code>remove(0)</code>, <code>send</code>) from memory.</li><li>Know DV versus LS, the five TCP variants, CSMA/CD versus CSMA/CA, Dense versus Sparse mode, DORA.</li></ul></div></details><details class="grp " open><summary>Exam-day checklist</summary><div class="gb"><ul><li>On the lab machine, check <code>ns</code>, <code>nam</code>, <code>xgraph</code>, <code>awk</code> or <code>gawk</code>, <code>javac</code> and <code>java</code> before you start.</li><li>Work in a fresh folder and keep exact file names, because scripts refer to each other (<code>analysis.awk</code> in Program 10).</li><li>Type the short versions where they exist: <code>DV_SHORT</code>, <code>multicast_SHORT</code>, <code>ethernet_lan_SHORT</code>, <code>wireless_lan_SHORT</code>, <code>congestion_control_UNIFIED</code>.</li><li>Run each script once straight after typing it, so a typo shows up early.</li><li>Take a screenshot or note the output of each run for the record.</li><li>If the exam gives you the repo or the lab sheet, compare my corrections (marked in the sections) against it before assuming either one is wrong.</li></ul></div></details></section>
+<p class="footer">Source code: AhmedBaari/computer-networks on GitHub, with the errors found while testing corrected and marked.</p>
+</div></div>
+<div class="dock"><button id="pv" type="button" aria-label="Previous section">&lsaquo; Prev</button><div class="cur" id="cur">Overview</div><button id="nx" class="nx" type="button" aria-label="Next section">Next &rsaquo;</button></div>
+<script>
+(function(){
+ function store(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}}
+ function copy(btn,text){function ok(){var o=btn.textContent;btn.textContent='Copied';setTimeout(function(){btn.textContent=o},1200)}
+  function fb(){var r=document.createRange();r.selectNodeContents(btn.closest('.code,.cmd').querySelector('code'));var s=getSelection();s.removeAllRanges();s.addRange(r);btn.textContent='Selected'}
+  try{navigator.clipboard.writeText(text).then(ok,fb)}catch(e){fb()}}
+ document.querySelectorAll('.cp').forEach(function(b){b.onclick=function(){copy(b,b.closest('.code,.cmd').querySelector('code').textContent)}});
+ var ids=[].slice.call(document.querySelectorAll('.sec,#start')).map(function(s){return s.id});
+ var done=(store('cn-done')||'').split(',').filter(Boolean);
+ function paint(){
+  document.querySelectorAll('.done').forEach(function(b){var on=done.indexOf(b.dataset.id)>-1;b.classList.toggle('on',on);b.textContent=on?'Revised ✓':'Mark revised'});
+  document.querySelectorAll('#nav a,#snav a').forEach(function(a){var id=a.getAttribute('href').slice(1);a.classList.toggle('dn',done.indexOf(id)>-1)});
+  var n=done.filter(function(d){return document.getElementById(d)&&/^p/.test(d)}).length;
+  document.querySelectorAll('.pc').forEach(function(e){e.textContent=n+' / 12'});
+  document.querySelectorAll('.pf').forEach(function(e){e.style.width=(n/12*100)+'%'})}
+ document.querySelectorAll('.done').forEach(function(b){b.onclick=function(){var i=done.indexOf(b.dataset.id);if(i>-1)done.splice(i,1);else done.push(b.dataset.id);store('cn-done',done.join(','));paint()}});
+ paint();
+ function setAll(o){document.querySelectorAll('details.grp').forEach(function(d){d.open=o})}
+ document.getElementById('ea').onclick=function(){setAll(true)};document.getElementById('ca').onclick=function(){setAll(false)};
+ var cur=0;var label=document.getElementById('cur');
+ var names={};document.querySelectorAll('#snav a').forEach(function(a){var tn=[].filter.call(a.childNodes,function(n){return n.nodeType===3}).map(function(n){return n.textContent}).join('').trim();names[a.getAttribute('href').slice(1)]=tn});
+ function set(id){cur=Math.max(0,ids.indexOf(id));
+  document.querySelectorAll('#nav a,#snav a').forEach(function(l){l.classList.toggle('on',l.getAttribute('href')==='#'+id)});
+  var t=document.querySelector('#nav a.on'),nv=document.getElementById('nav');if(t&&nv.offsetWidth)nv.scrollLeft=t.offsetLeft-nv.clientWidth/2+t.offsetWidth/2;
+  label.textContent=names[id]||'Overview';document.getElementById('pv').disabled=cur===0;document.getElementById('nx').disabled=cur===ids.length-1}
+ function go(i){var e=document.getElementById(ids[i]);if(e)e.scrollIntoView()}
+ document.getElementById('pv').onclick=function(){go(Math.max(0,cur-1))};document.getElementById('nx').onclick=function(){go(Math.min(ids.length-1,cur+1))};
+ if('IntersectionObserver' in window){var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting)set(e.target.id)})},{rootMargin:'-18% 0px -75% 0px'});
+  ids.forEach(function(i){io.observe(document.getElementById(i))})}
+ set('start');
+})();
+</script>
+
+</body></html>
